@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0a0b0e">
-<title>Vortex Searcher</title>
+<title>Vortex — Recherche avancée</title>
 <link rel="icon" type="image/jpeg" href="/IMG_0662.jpeg">
 <link rel="apple-touch-icon" href="/IMG_0662.jpeg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -322,46 +322,159 @@
   .ckb.ref{background:var(--glass-2);border-color:var(--glass-border);color:var(--text-2);}
   .ckb.ref:hover{background:var(--glass-3);color:var(--text);}
 
+  /* ===== MUSIC PLAYER ===== */
+  .music-player{
+    position:fixed;
+    bottom:84px;
+    right:24px;
+    z-index:650;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 8px 8px 14px;
+    border-radius:var(--r-pill);
+    background:linear-gradient(135deg,rgba(255,255,255,0.09) 0%,rgba(255,255,255,0.03) 100%);
+    border:1px solid var(--glass-border-2);
+    backdrop-filter:blur(40px) saturate(200%);
+    -webkit-backdrop-filter:blur(40px) saturate(200%);
+    box-shadow:
+      0 12px 40px rgba(0,0,0,0.55),
+      0 1px 0 rgba(255,255,255,0.15) inset,
+      0 -1px 0 rgba(0,0,0,0.3) inset;
+    transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    max-width:calc(100vw - 48px);
+    pointer-events:auto;
+  }
+  .music-player::before{
+    content:'';
+    position:absolute;
+    top:0;left:0;right:0;height:50%;
+    border-radius:var(--r-pill) var(--r-pill) 0 0;
+    background:linear-gradient(180deg,rgba(255,255,255,0.10) 0%,transparent 100%);
+    pointer-events:none;
+  }
+  .music-info{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    min-width:0;
+    flex:1;
+    position:relative;
+    z-index:1;
+    padding-right:4px;
+  }
+  .music-title{
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--text);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    letter-spacing:-0.01em;
+  }
+  .music-sub{
+    font-size:9.5px;
+    color:var(--text-3);
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .music-btn{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:linear-gradient(180deg,#ffffff 0%,#d6d9df 55%,#b8bcc4 100%);
+    border:1px solid rgba(255,255,255,0.4);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+    position:relative;
+    z-index:1;
+    transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow:
+      0 4px 14px rgba(0,0,0,0.4),
+      0 1px 0 rgba(255,255,255,0.8) inset;
+  }
+  .music-btn:hover{
+    transform:scale(1.08);
+    box-shadow:
+      0 6px 20px rgba(0,0,0,0.5),
+      0 1px 0 rgba(255,255,255,0.9) inset;
+  }
+  .music-btn:active{
+    transform:scale(0.96);
+  }
+  .music-btn svg{
+    width:15px;
+    height:15px;
+    color:#0a0b0e;
+    transition:opacity 0.2s;
+  }
+  .music-btn .ico-play,
+  .music-btn .ico-pause{
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .music-btn .ico-pause{
+    opacity:0;
+    transform:translate(-50%,-50%) scale(0.6);
+  }
+  .music-btn.playing .ico-play{
+    opacity:0;
+    transform:translate(-50%,-50%) scale(0.6);
+  }
+  .music-btn.playing .ico-pause{
+    opacity:1;
+    transform:translate(-50%,-50%) scale(1);
+  }
+
+  /* Barre de progression fine */
+  .music-progress{
+    position:absolute;
+    left:14px;
+    right:56px;
+    bottom:5px;
+    height:2px;
+    border-radius:2px;
+    background:rgba(255,255,255,0.08);
+    overflow:hidden;
+    z-index:1;
+    pointer-events:none;
+  }
+  .music-progress-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--accent),var(--accent-bright));
+    border-radius:2px;
+    transition:width 0.15s linear;
+  }
+
+  @media (max-width:720px){
+    .music-player{
+      bottom:76px;
+      right:14px;
+      left:14px;
+      max-width:none;
+      padding:7px 7px 7px 12px;
+    }
+    .music-title{font-size:11px;}
+    .music-sub{font-size:9px;}
+    .music-btn{width:34px;height:34px;}
+    .music-btn svg{width:13px;height:13px;}
+    .music-progress{left:12px;right:50px;bottom:4px;}
+  }
+
   ::-webkit-scrollbar{width:10px;height:10px;}
   ::-webkit-scrollbar-track{background:transparent;}
   ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.10);border-radius:var(--r-pill);border:2px solid transparent;background-clip:content-box;}
   ::selection{background:var(--accent-soft);color:var(--accent-bright);}
-
-  @media (max-width:720px){
-    .topbar{top:10px;padding:6px 6px 6px 10px;gap:10px;}
-    .brand-name{font-size:13px;}
-    .brand-logo{width:28px;height:28px;border-radius:9px;}
-    .tb-link{padding:7px 11px;font-size:12px;}
-    .tb-link.optional{display:none;}
-    .wrap{padding:82px 14px 60px;}
-    .hero h1{font-size:26px;}
-    .hero p{font-size:13.5px;}
-    .stats-row{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;}
-    .stat{padding:12px 14px;}
-    .stat-value{font-size:16px;}
-    .search-card{padding:12px;}
-    .search-row{flex-direction:column;gap:10px;}
-    button.go{width:100%;height:50px;}
-    #target{font-size:16px;padding:15px 88px 15px 44px;}
-    .crit-hint{display:none;}
-    .grid-2{grid-template-columns:1fr;}
-    .card{padding:16px;}
-    .card-head{gap:12px;padding-bottom:12px;margin-bottom:12px;}
-    .av{width:44px;height:44px;font-size:15px;}
-    .card-name{font-size:15.5px;}
-    .act{width:34px;height:34px;}
-    .fields{grid-template-columns:1fr;gap:4px;}
-    .frow{flex-direction:column;align-items:flex-start;gap:4px;padding:10px 12px;}
-    .fval{text-align:left;justify-content:flex-start;width:100%;font-size:13px;}
-    .mc{opacity:1;}
-    .src-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
-    .types-grid,.info-grid{grid-template-columns:1fr;}
-    .toasts{right:14px;left:14px;bottom:14px;align-items:stretch;}
-    .toast{min-width:0;max-width:100%;}
-    .ck-btns{flex-direction:column-reverse;}
-    .stop{bottom:16px;left:14px;width:42px;height:42px;}
-    footer{flex-direction:column;align-items:flex-start;}
-  }
 </style>
 </head>
 <body>
@@ -379,7 +492,7 @@
     <div class="brand-logo">
       <img src="/IMG_0662.jpeg" alt="Vortex">
     </div>
-    <span class="brand-name">Vortex Searcher</span>
+    <span class="brand-name">Vortex</span>
   </div>
   <nav class="tb-links">
     <button class="tb-link active" type="button">Recherche</button>
@@ -393,7 +506,7 @@
   <section class="hero">
     <div class="hero-pill">
       <span class="dot"></span>
-      En Ligne
+      Service opérationnel
     </div>
     <h1>
       Retrouvez n'importe qui,<br>
@@ -403,7 +516,7 @@
   </section>
 
   <div class="stats-row">
-    <div class="stat"><div class="stat-label">Sources</div><div class="stat-value">14Md+ <small>indexées</small></div></div>
+    <div class="stat"><div class="stat-label">Sources</div><div class="stat-value">13 <small>indexées</small></div></div>
     <div class="stat"><div class="stat-label">Latence</div><div class="stat-value">~1.2<small>s</small></div></div>
     <div class="stat"><div class="stat-label">Statut</div><div class="stat-value"><span class="stat-dot"></span>En ligne</div></div>
     <div class="stat"><div class="stat-label">Zone</div><div class="stat-value">FR <small>+ EU</small></div></div>
@@ -663,6 +776,22 @@
 
 <div class="toasts" id="toasts"></div>
 
+<!-- ===== MUSIC PLAYER ===== -->
+<div class="music-player" id="musicPlayer">
+  <div class="music-progress"><div class="music-progress-fill" id="musicProgress"></div></div>
+  <div class="music-info">
+    <div class="music-title">sometime</div>
+    <div class="music-sub">baby hayabusa</div>
+  </div>
+  <button class="music-btn" id="musicBtn" type="button" aria-label="Lecture / Pause">
+    <svg class="ico-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+    <svg class="ico-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+  </button>
+</div>
+<audio id="musicAudio" preload="none" loop>
+  <source src="https://cdn.whyp.it/013399e4-94f9-409e-8472-1f39b09191a8.mp3?token=OrU2gIqCGZDsCTZvEV8BoqHWroudQosB_OYvKTlvKYs&expires=1791676800" type="audio/mpeg">
+</audio>
+
 <button class="stop" id="scrollTop" type="button" aria-label="Haut de page">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
     <polyline points="18 15 12 9 6 15"></polyline>
@@ -740,7 +869,6 @@
 (function(){
   "use strict";
 
-  /* Utils */
   function $(id){ return document.getElementById(id); }
   function esc(s){
     return String(s == null ? "" : s).replace(/[&<>"']/g, function(m){
@@ -748,7 +876,6 @@
     });
   }
 
-  /* Labels / ordre des champs */
   var LABELS = {
     _source_db:"Source", adresse:"Adresse", annee_naissance:"Année",
     code_postal:"CP", date_naissance:"Naissance", departement:"Dépt",
@@ -774,7 +901,6 @@
     return s || null;
   }
 
-  /* Toasts */
   var toastsEl = $("toasts");
   function toast(msg, type, dur){
     type = type || "success"; dur = dur || 2600;
@@ -791,16 +917,13 @@
     }, dur);
   }
 
-  /* Modales */
   function openModal(id){
     var e = $(id); if (!e) return;
-    e.classList.add("open");
-    document.body.classList.add("modal-open");
+    e.classList.add("open"); document.body.classList.add("modal-open");
   }
   function closeModal(id){
     var e = $(id); if (!e) return;
-    e.classList.remove("open");
-    document.body.classList.remove("modal-open");
+    e.classList.remove("open"); document.body.classList.remove("modal-open");
   }
   if ($("navAbout")) $("navAbout").addEventListener("click", function(){ openModal("aboutModal"); });
   if ($("navLegal")) $("navLegal").addEventListener("click", function(){ openModal("legalModal"); });
@@ -812,8 +935,7 @@
   document.querySelectorAll(".mbg").forEach(function(b){
     b.addEventListener("click", function(e){
       if (e.target === b) {
-        b.classList.remove("open");
-        document.body.classList.remove("modal-open");
+        b.classList.remove("open"); document.body.classList.remove("modal-open");
       }
     });
   });
@@ -824,16 +946,12 @@
     }
   });
 
-  /* FAQ — accordéon */
   document.querySelectorAll(".faq-item").forEach(function(it){
     var q = it.querySelector(".faq-q");
     if (!q) return;
-    q.addEventListener("click", function(){
-      it.classList.toggle("open");
-    });
+    q.addEventListener("click", function(){ it.classList.toggle("open"); });
   });
 
-  /* Cookies */
   (function(){
     var b = $("cookieBanner"); if (!b) return;
     var c = null; try { c = localStorage.getItem("vx-ck"); } catch(e){}
@@ -844,13 +962,12 @@
       setTimeout(function(){ b.remove(); }, 500);
       toast(v === "a" ? "Préférences enregistrées" : "Refus enregistré", "success", 1500);
     }
-    var acc = $("cookieAccept"); if (acc) acc.addEventListener("click", function(){ dis("a"); });
-    var ref = $("cookieRefuse"); if (ref) ref.addEventListener("click", function(){ dis("r"); });
+    if ($("cookieAccept")) $("cookieAccept").addEventListener("click", function(){ dis("a"); });
+    if ($("cookieRefuse")) $("cookieRefuse").addEventListener("click", function(){ dis("r"); });
     var ll = $("cookieLegalLink");
     if (ll) ll.addEventListener("click", function(e){ e.preventDefault(); openModal("legalModal"); });
   })();
 
-  /* Scroll top */
   var stop = $("scrollTop");
   if (stop) {
     window.addEventListener("scroll", function(){
@@ -861,7 +978,42 @@
     });
   }
 
-  /* Input */
+  /* ===== MUSIC PLAYER ===== */
+  (function(){
+    var audio = $("musicAudio");
+    var btn = $("musicBtn");
+    var prog = $("musicProgress");
+    if (!audio || !btn) return;
+
+    function updateProgress(){
+      if (audio.duration && !isNaN(audio.duration)) {
+        var p = (audio.currentTime / audio.duration) * 100;
+        if (prog) prog.style.width = p + "%";
+      }
+    }
+
+    btn.addEventListener("click", function(){
+      if (audio.paused) {
+        audio.play().catch(function(err){
+          console.warn("Play error:", err);
+        });
+      } else {
+        audio.pause();
+      }
+    });
+
+    audio.addEventListener("play", function(){ btn.classList.add("playing"); });
+    audio.addEventListener("pause", function(){ btn.classList.remove("playing"); });
+    audio.addEventListener("timeupdate", updateProgress);
+    audio.addEventListener("ended", function(){
+      btn.classList.remove("playing");
+      if (prog) prog.style.width = "0%";
+    });
+
+    // Premier clic = déblocage de l'audio + play
+    btn.addEventListener("click", function(){}, { once:true });
+  })();
+
   var input = $("target");
   var inputX = $("inputX");
   var badge = $("inputBadge");
@@ -878,25 +1030,26 @@
   }
 
   function updateBadge(){
+    if (!input || !badge) return;
     var t = detectType(input.value);
     if (t && input.value.trim().length > 2) {
       badge.textContent = TYPE_LABELS[t];
       badge.classList.add("visible");
-      inputX.classList.remove("visible");
+      if (inputX) inputX.classList.remove("visible");
     } else {
       badge.classList.remove("visible");
-      inputX.classList.toggle("visible", input.value.length > 0);
+      if (inputX) inputX.classList.toggle("visible", input.value.length > 0);
     }
   }
 
-  input.addEventListener("input", updateBadge);
-  inputX.addEventListener("click", function(){
+  if (input) input.addEventListener("input", updateBadge);
+  if (inputX) inputX.addEventListener("click", function(){
+    if (!input) return;
     input.value = "";
     updateBadge();
     input.focus();
   });
 
-  /* Critères */
   var FILTERS = {
     ville:"f_ville", code_postal:"f_code_postal", departement:"f_departement",
     pays:"f_pays", adresse:"f_adresse", adresse_ip:"f_adresse_ip",
@@ -916,9 +1069,9 @@
   function updateFiltersCount(){
     var n = Object.keys(readFilters()).length;
     var c = $("filtersCount"), h = $("filtersHint");
+    if (!c || !h) return;
     if (n > 0) {
-      c.textContent = n;
-      c.style.display = "inline-flex";
+      c.textContent = n; c.style.display = "inline-flex";
       h.textContent = n + " critère" + (n>1?"s":"") + " actif" + (n>1?"s":"");
     } else {
       c.style.display = "none";
@@ -947,11 +1100,11 @@
   if ($("filtersToggle")) $("filtersToggle").addEventListener("click", function(){
     var body = $("filtersBody");
     var tg = $("filtersToggle");
+    if (!body || !tg) return;
     body.classList.toggle("open");
     tg.classList.toggle("open");
   });
 
-  /* Requête HTTP — endpoint /api/search */
   var ENDPOINT = "/api/search";
 
   function httpGet(params){
@@ -981,7 +1134,6 @@
     });
   }
 
-  /* Extraction tableau */
   function findArray(o, depth){
     depth = depth || 0;
     if (depth > 6 || !o) return null;
@@ -1000,9 +1152,8 @@
     return null;
   }
 
-  /* Construction payload */
   function buildParams(){
-    var v = input.value.trim();
+    var v = input ? input.value.trim() : "";
     var f = readFilters();
     var p = {};
     var t = detectType(v);
@@ -1019,9 +1170,8 @@
     return p;
   }
 
-  /* Validation */
   function validate(){
-    var v = (input.value || "").trim();
+    var v = input ? (input.value || "").trim() : "";
     var hasF = Object.keys(readFilters()).length > 0;
     if (v.length === 0 && hasF) return true;
     if (v.length < 3) return false;
@@ -1035,7 +1185,6 @@
     return false;
   }
 
-  /* Copie */
   function copyText(txt){
     if (navigator.clipboard && window.isSecureContext) {
       return navigator.clipboard.writeText(txt).then(function(){ return true; }, function(){ return fallback(txt); });
@@ -1044,11 +1193,8 @@
     function fallback(t){
       try {
         var ta = document.createElement("textarea");
-        ta.value = t;
-        ta.style.position = "fixed";
-        ta.style.opacity = "0";
-        document.body.appendChild(ta);
-        ta.select();
+        ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
         var ok = document.execCommand("copy");
         document.body.removeChild(ta);
         return ok;
@@ -1056,7 +1202,6 @@
     }
   }
 
-  /* Export JSON */
   function exportJSON(it, idx){
     var clean = {};
     Object.keys(it).forEach(function(k){
@@ -1069,17 +1214,13 @@
     var p2 = (it.nom_famille || "").toString().toLowerCase().replace(/\s+/g,"-");
     a.href = u;
     a.download = "vx-" + (p1 || "r") + "-" + (p2 || (idx+1)) + ".json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(u);
     toast("Fichier exporté", "success", 1500);
   }
 
-  /* Dédup */
   function groupDup(items){
-    var gs = [];
-    var used = {};
+    var gs = []; var used = {};
     function keysOf(it){
       var k = [];
       if (it.email) k.push("e:" + String(it.email).toLowerCase());
@@ -1092,8 +1233,7 @@
     }
     items.forEach(function(it, ix){
       if (used[ix]) return;
-      var g = [it];
-      used[ix] = true;
+      var g = [it]; used[ix] = true;
       var mk = keysOf(it);
       items.forEach(function(o, jx){
         if (jx === ix || used[jx]) return;
@@ -1106,7 +1246,6 @@
     return gs;
   }
 
-  /* Rendu carte */
   function renderCard(it, idx, dc){
     dc = dc || 0;
     var pr = it.prenom || it.first_name || "";
@@ -1172,9 +1311,8 @@
     '</div>';
   }
 
-  /* Skeletons */
   function renderSkeletons(){
-    var out = $("out");
+    var out = $("out"); if (!out) return;
     var h = '<div class="res-header"><div class="res-count">Recherche<b>…</b></div><div class="res-meta">requête envoyée</div></div><div class="skels">';
     for (var i = 0; i < 3; i++){
       h += '<div class="skel"><div class="skel-av"></div><div class="skel-body"><div class="skel-ln h13 w40"></div><div class="skel-ln w60"></div><div class="skel-ln w85"></div><div class="skel-ln w50"></div></div></div>';
@@ -1183,15 +1321,13 @@
     out.innerHTML = h;
   }
 
-  /* Empty state */
   function renderEmpty(msg){
-    var out = $("out");
+    var out = $("out"); if (!out) return;
     out.innerHTML = '<div class="res-header"><div class="res-count">Aucun résultat</div><div class="res-meta">0 entrée</div></div>' +
       '<div class="empty"><div class="empty-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>' +
       '<h3>Rien à afficher</h3><p>' + esc(msg || "Aucun résultat ne correspond. Essayez d'autres termes ou retirez des critères.") + '</p></div>';
   }
 
-  /* Actions cartes */
   var currentItems = [];
   function bindCards(list){
     list.querySelectorAll(".mc").forEach(function(b){
@@ -1217,20 +1353,20 @@
     });
   }
 
-  /* Bouton rechercher */
   var goBtn = $("go");
-  var goLbl = goBtn.querySelector(".lbl");
+  var goLbl = goBtn ? goBtn.querySelector(".lbl") : null;
 
   function setLoading(on){
+    if (!goBtn || !goLbl) return;
     goBtn.disabled = on;
     goBtn.classList.toggle("loading", on);
     goLbl.textContent = on ? "…" : "Rechercher";
   }
 
-  goBtn.addEventListener("click", function(){
+  if (goBtn) goBtn.addEventListener("click", function(){
     if (!validate()) {
       toast("Entrée invalide — 3 caractères minimum", "error", 2200);
-      input.focus();
+      if (input) input.focus();
       return;
     }
 
@@ -1288,14 +1424,13 @@
     });
   });
 
-  input.addEventListener("keydown", function(e){
+  if (input) input.addEventListener("keydown", function(e){
     if (e.key === "Enter") {
       e.preventDefault();
-      goBtn.click();
+      if (goBtn) goBtn.click();
     }
   });
 
-  /* Init */
   updateFiltersCount();
   updateBadge();
 
