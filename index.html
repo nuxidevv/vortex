@@ -322,14 +322,14 @@
   .ckb.ref:hover{background:var(--glass-3);color:var(--text);}
 
   /* ================================================
-     MUSIC PLAYER
+     MUSIC PLAYER — nouvelle version premium
      ================================================ */
   .music-player{
     position:fixed;
     bottom:24px;
     right:24px;
     z-index:640;
-    width:330px;
+    width:320px;
     max-width:calc(100vw - 48px);
     padding:14px 16px 12px;
     border-radius:22px;
@@ -365,7 +365,6 @@
     pointer-events:none;
     filter:blur(20px);
     transition:opacity 0.5s;
-    opacity:0;
   }
   .music-player.playing::after{
     opacity:1;
@@ -385,6 +384,7 @@
     z-index:2;
   }
 
+  /* Vinyle rotatif */
   .mp-vinyl{
     width:44px;
     height:44px;
@@ -467,7 +467,7 @@
     line-height:1.2;
   }
   .mp-artist{
-    font-size:10px;
+    font-size:10.5px;
     color:var(--text-3);
     letter-spacing:0.05em;
     text-transform:uppercase;
@@ -478,6 +478,7 @@
     font-family:'JetBrains Mono',monospace;
   }
 
+  /* Barres audio animées */
   .mp-bars{
     display:flex;
     align-items:flex-end;
@@ -509,6 +510,7 @@
     50%{transform:scaleY(1.4);}
   }
 
+  /* Bouton play/pause */
   .mp-btn{
     width:44px;
     height:44px;
@@ -571,6 +573,7 @@
     transform:scale(1);
   }
 
+  /* Barre de progression */
   .mp-prog{
     position:relative;
     height:3px;
@@ -622,6 +625,7 @@
     position:relative;
   }
 
+  /* Responsive */
   @media (max-width:720px){
     .music-player{
       bottom:16px;
@@ -635,7 +639,7 @@
     .mp-vinyl{width:40px;height:40px;}
     .mp-vinyl img{width:20px;height:20px;}
     .mp-title{font-size:12.5px;}
-    .mp-artist{font-size:9px;}
+    .mp-artist{font-size:9.5px;}
     .mp-btn{width:40px;height:40px;}
     .mp-btn svg{width:15px;height:15px;}
     .mp-bars span:nth-child(5){display:none;}
@@ -956,8 +960,8 @@
       <img src="/IMG_0662.jpeg" alt="">
     </div>
     <div class="mp-info">
-      <div class="mp-title">100 000 LUMEN</div>
-      <div class="mp-artist">Ptite Soeur · Femtogo · neophron</div>
+      <div class="mp-title">sometime</div>
+      <div class="mp-artist">baby hayabusa</div>
     </div>
     <div class="mp-bars">
       <span></span><span></span><span></span><span></span><span></span>
@@ -972,11 +976,11 @@
   </div>
   <div class="mp-times">
     <span id="musicCurrent">0:00</span>
-    <span id="musicDuration">2:26</span>
+    <span id="musicDuration">0:00</span>
   </div>
 </div>
 <audio id="musicAudio" preload="metadata" loop>
-  <source src="https://cdn.whyp.it/3dc4b6bd-59e0-4715-82e8-f0d2c7e0e56d.mp3" type="audio/mpeg">
+  <source src="https://cdn.whyp.it/013399e4-94f9-409e-8472-1f39b09191a8.mp3?token=OrU2gIqCGZDsCTZvEV8BoqHWroudQosB_OYvKTlvKYs&expires=1791676800" type="audio/mpeg">
 </audio>
 
 <button class="stop" id="scrollTop" type="button" aria-label="Haut de page">
@@ -1200,6 +1204,7 @@
       }
     });
 
+    // Clic sur la barre = seek
     if (wrapProg) {
       wrapProg.addEventListener("click", function(e){
         if (!audio.duration || isNaN(audio.duration)) return;
@@ -1229,6 +1234,7 @@
       if (tCur) tCur.textContent = "0:00";
     });
 
+    // Met à jour la durée si pas encore chargée
     if (audio.readyState >= 1 && tDur) {
       tDur.textContent = fmt(audio.duration);
     }
