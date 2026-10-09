@@ -256,7 +256,7 @@
   .type-ico svg{width:18px;height:18px;}
   .type-title{font-size:14px;font-weight:700;color:var(--text);letter-spacing:-0.01em;margin-bottom:6px;}
   .type-desc{font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:10px;}
-  .type-example{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);padding:6px 10px;border-radius:var(--r-sm);background:rgba(0,0,0,0.3);border:1px solid var(--glass-border);display:inline-block;word-break:break-all;}
+  .type-example{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-2);padding:6px 10px;border-radius:var(--r-sm);background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);display:inline-block;word-break:break-all;}
 
   .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;}
   .info-card{padding:18px;border-radius:var(--r);background:var(--glass);border:1px solid var(--glass-border);transition:all 0.25s;display:flex;gap:12px;align-items:flex-start;}
@@ -948,7 +948,6 @@
 (function(){
   "use strict";
 
-  /* ---------- helpers ---------- */
   var _0 = function(i){ return document.getElementById(i); };
   var _1 = function(s){
     return String(s == null ? "" : s).replace(/[&<>"']/g, function(m){
@@ -981,7 +980,6 @@
     return s || null;
   }
 
-  /* ---------- toasts ---------- */
   var _T = _0("toasts");
   function _tst(m, t, d){
     t = t || "success"; d = d || 2600;
@@ -998,7 +996,6 @@
     }, d);
   }
 
-  /* ---------- modales ---------- */
   function _opn(id){
     var e = _0(id); if (!e) return;
     e.classList.add("open"); document.body.classList.add("modal-open");
@@ -1026,14 +1023,12 @@
     }
   });
 
-  /* ---------- faq ---------- */
   document.querySelectorAll(".faq-item").forEach(function(it){
     var q = it.querySelector(".faq-q");
     if (!q) return;
     q.addEventListener("click", function(){ it.classList.toggle("open"); });
   });
 
-  /* ---------- cookies ---------- */
   (function(){
     var b = _0("cookieBanner"); if (!b) return;
     var c = null; try { c = localStorage.getItem("vx-ck"); } catch(e){}
@@ -1050,14 +1045,12 @@
     if (ll) ll.addEventListener("click", function(e){ e.preventDefault(); _opn("legalModal"); });
   })();
 
-  /* ---------- scroll top ---------- */
   var _st = _0("scrollTop");
   window.addEventListener("scroll", function(){
     _st.classList.toggle("visible", window.scrollY > 400);
   }, { passive:true });
   _st.addEventListener("click", function(){ window.scrollTo({ top:0, behavior:"smooth" }); });
 
-  /* ---------- input ---------- */
   var _i = _0("target");
   var _x = _0("inputX");
   var _bd = _0("inputBadge");
@@ -1083,7 +1076,6 @@
   _i.addEventListener("input", _ub);
   _x.addEventListener("click", function(){ _i.value = ""; _ub(); _i.focus(); });
 
-  /* ---------- critères ---------- */
   var _F = { ville:"f_ville", code_postal:"f_code_postal", departement:"f_departement", pays:"f_pays", adresse:"f_adresse", adresse_ip:"f_adresse_ip", iban:"f_iban", bic:"f_bic", annee_naissance:"f_annee_naissance", genre:"f_genre" };
 
   function _rf(){
@@ -1121,10 +1113,7 @@
     _0("filtersToggle").classList.toggle("open");
   });
 
-  /* ---------- obfuscated channel ---------- */
-  /* Internal transport: POST body carries an opaque base64 token. */
   var _u = "L2FwaS9k";
-  var _k = 0x5a;
   var _ep = (function(){
     var raw = "";
     try { raw = atob(_u); } catch(e){ raw = ""; }
@@ -1132,18 +1121,7 @@
   })();
 
   function _enc(obj){
-    try {
-      var j = JSON.stringify(obj);
-      var bytes = [];
-      for (var i = 0; i < j.length; i++){
-        bytes.push(j.charCodeAt(i) ^ _k);
-      }
-      var bin = "";
-      for (var j2 = 0; j2 < bytes.length; j2++){
-        bin += String.fromCharCode(bytes[j2]);
-      }
-      return btoa(bin);
-    } catch(e){ return ""; }
+    try { return btoa(JSON.stringify(obj)); } catch(e){ return ""; }
   }
 
   function _xhr(payload){
@@ -1195,16 +1173,14 @@
     var f = _rf();
     var p = {};
     var t = _dt(v);
-    if (t === "b") { p.c = v; }
-    else if (t === "c") { p.d = v.replace(/[\s.\-()]/g, ""); }
+    if (t === "b") { p.email = v; }
+    else if (t === "c") { p.telephone = v.replace(/[\s.\-()]/g, ""); }
     else if (v.length > 0) {
       var parts = v.split(/\s+/);
-      p.a = parts[0] || "";
-      p.b = parts.slice(1).join(" ") || "";
+      p.prenom = parts[0] || "";
+      p.nom_famille = parts.slice(1).join(" ") || "";
     }
-    /* map criteria to short keys */
-    var km = { ville:"e", code_postal:"f", departement:"g", pays:"h", adresse:"i", adresse_ip:"j", iban:"k", bic:"l", annee_naissance:"m", genre:"n" };
-    Object.keys(f).forEach(function(k){ p[km[k] || k] = f[k]; });
+    Object.keys(f).forEach(function(k){ p[k] = f[k]; });
     return p;
   }
 
@@ -1337,8 +1313,8 @@
 
   function _emp(msg){
     var o = _0("out");
-    o.innerHTML = '<div class="res-header"><div class="res-count">Aucun résultat</div><div class="res-meta">0 entrée</div></div>' +
-      '<div class="empty"><div class="empty-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>' +
+    o.innerHTML = '<div class="res-header"><div class="res-count">Aucun résultat</div><div class "="res-meta">0 entrée</div></…div>' +
+      '<div class="empty"><div class="empty"-ico"><svg viewBox="0 0  :24 24" fill="none" stroke="current "Color" stroke-width="2" stroke-linecap="Recround" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>' +
       '<h3>Rien à afficher</h3><p>' + _1(msg || "Aucun résultat ne correspond. Essayez d'autres termes ou retirez des critères.") + '</p></div>';
   }
 
@@ -1366,7 +1342,7 @@
   var _g = _0("go"); var _gl = _g.querySelector(".lbl");
   function _sl(on){
     _g.disabled = on; _g.classList.toggle("loading", on);
-    _gl.textContent = on ? "…" : "Rechercher";
+    _gl.textContent = on ?hercher";
   }
 
   _g.addEventListener("click", function(){
