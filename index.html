@@ -264,6 +264,7 @@
   .faq-a{max-height:0;overflow:hidden;transition:max-height 0.35s;}
   .faq-item.open .faq-a{max-height:400px;}
   .faq-a-inner{padding:0 18px 16px;font-size:12.5px;color:var(--text-2);line-height:1.65;border-top:1px solid var(--glass-border);padding-top:14px;}
+  .faq-a-inner code{font-family:'JetBrains Mono',monospace;font-size:11.5px;padding:2px 6px;border-radius:6px;background:rgba(0,0,0,0.35);border:1px solid var(--glass-border);color:var(--accent-bright);}
 
   footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
   .foot-left{font-size:11.5px;color:var(--text-3);font-family:'JetBrains Mono',monospace;}
@@ -321,337 +322,46 @@
   .ckb.ref{background:var(--glass-2);border-color:var(--glass-border);color:var(--text-2);}
   .ckb.ref:hover{background:var(--glass-3);color:var(--text);}
 
-  /* ================================================
-     MUSIC PLAYER — nouvelle version premium
-     ================================================ */
-  .music-player{
-    position:fixed;
-    bottom:24px;
-    right:24px;
-    z-index:640;
-    width:320px;
-    max-width:calc(100vw - 48px);
-    padding:14px 16px 12px;
-    border-radius:22px;
-    background:linear-gradient(150deg,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0.03) 60%,rgba(255,255,255,0.05) 100%);
-    border:1px solid var(--glass-border-2);
-    backdrop-filter:blur(48px) saturate(200%);
-    -webkit-backdrop-filter:blur(48px) saturate(200%);
-    box-shadow:
-      0 20px 50px rgba(0,0,0,0.55),
-      0 1px 0 rgba(255,255,255,0.16) inset,
-      0 -1px 0 rgba(0,0,0,0.35) inset,
-      0 0 60px rgba(180,200,230,0.06);
-    transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
-    pointer-events:auto;
-    overflow:hidden;
-  }
-  .music-player::before{
-    content:'';
-    position:absolute;
-    top:0;left:0;right:0;
-    height:1px;
-    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.55) 50%,transparent);
-    opacity:0.7;
-    pointer-events:none;
-  }
-  .music-player::after{
-    content:'';
-    position:absolute;
-    top:-40%;right:-40%;
-    width:80%;height:80%;
-    border-radius:50%;
-    background:radial-gradient(circle,rgba(200,215,240,0.10) 0%,transparent 70%);
-    pointer-events:none;
-    filter:blur(20px);
-    transition:opacity 0.5s;
-  }
-  .music-player.playing::after{
-    opacity:1;
-    animation:glowPulse 4s ease-in-out infinite;
-  }
-  @keyframes glowPulse{
-    0%,100%{opacity:0.6;transform:scale(1);}
-    50%{opacity:1;transform:scale(1.15);}
-  }
-
-  .mp-head{
-    display:flex;
-    align-items:center;
-    gap:11px;
-    margin-bottom:11px;
-    position:relative;
-    z-index:2;
-  }
-
-  /* Vinyle rotatif */
-  .mp-vinyl{
-    width:44px;
-    height:44px;
-    border-radius:50%;
-    position:relative;
-    flex-shrink:0;
-    background:
-      radial-gradient(circle at 50% 50%,
-        #1a1c20 0%,
-        #1a1c20 18%,
-        #0d0e11 19%,
-        #0d0e11 22%,
-        #1a1c20 23%,
-        #15171b 40%,
-        #0d0e11 41%,
-        #15171b 60%,
-        #0d0e11 61%,
-        #1a1c20 100%);
-    box-shadow:
-      0 6px 18px rgba(0,0,0,0.55),
-      0 1px 0 rgba(255,255,255,0.08) inset,
-      0 0 0 1px rgba(255,255,255,0.06) inset;
-    transition:transform 0.3s;
-    overflow:hidden;
-  }
-  .mp-vinyl::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    border-radius:50%;
-    background:
-      radial-gradient(circle, transparent 60%, rgba(255,255,255,0.04) 61%, transparent 62%),
-      radial-gradient(circle, transparent 72%, rgba(255,255,255,0.03) 73%, transparent 74%),
-      radial-gradient(circle, transparent 84%, rgba(255,255,255,0.03) 85%, transparent 86%);
-    pointer-events:none;
-  }
-  .mp-vinyl img{
-    position:absolute;
-    top:50%;left:50%;
-    transform:translate(-50%,-50%);
-    width:22px;
-    height:22px;
-    border-radius:50%;
-    object-fit:cover;
-    z-index:2;
-    border:1.5px solid rgba(255,255,255,0.18);
-    box-shadow:0 2px 6px rgba(0,0,0,0.5);
-  }
-  .mp-vinyl::after{
-    content:'';
-    position:absolute;
-    top:50%;left:50%;
-    width:4px;height:4px;
-    border-radius:50%;
-    background:#0a0b0e;
-    transform:translate(-50%,-50%);
-    z-index:3;
-    box-shadow:0 0 0 1px rgba(255,255,255,0.15);
-  }
-  .music-player.playing .mp-vinyl{
-    animation:spin 4s linear infinite;
-  }
-  @keyframes spin{to{transform:rotate(360deg);}}
-
-  .mp-info{
-    flex:1;
-    min-width:0;
-    display:flex;
-    flex-direction:column;
-    gap:2px;
-  }
-  .mp-title{
-    font-size:13.5px;
-    font-weight:600;
-    color:var(--text);
-    letter-spacing:-0.01em;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    line-height:1.2;
-  }
-  .mp-artist{
-    font-size:10.5px;
-    color:var(--text-3);
-    letter-spacing:0.05em;
-    text-transform:uppercase;
-    font-weight:600;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    font-family:'JetBrains Mono',monospace;
-  }
-
-  /* Barres audio animées */
-  .mp-bars{
-    display:flex;
-    align-items:flex-end;
-    gap:2.5px;
-    height:16px;
-    flex-shrink:0;
-    opacity:0.35;
-    transition:opacity 0.3s;
-    margin-right:4px;
-  }
-  .music-player.playing .mp-bars{opacity:1;}
-  .mp-bars span{
-    width:2.5px;
-    background:linear-gradient(180deg,var(--accent-bright),var(--accent));
-    border-radius:1px;
-    height:4px;
-    transition:height 0.2s;
-  }
-  .music-player.playing .mp-bars span{
-    animation:barPulse 0.9s ease-in-out infinite;
-  }
-  .mp-bars span:nth-child(1){animation-delay:0s;height:8px;}
-  .mp-bars span:nth-child(2){animation-delay:0.15s;height:14px;}
-  .mp-bars span:nth-child(3){animation-delay:0.3s;height:6px;}
-  .mp-bars span:nth-child(4){animation-delay:0.45s;height:12px;}
-  .mp-bars span:nth-child(5){animation-delay:0.6s;height:9px;}
-  @keyframes barPulse{
-    0%,100%{transform:scaleY(0.5);}
-    50%{transform:scaleY(1.4);}
-  }
-
-  /* Bouton play/pause */
-  .mp-btn{
-    width:44px;
-    height:44px;
-    border-radius:50%;
-    background:linear-gradient(180deg,#ffffff 0%,#dce0e7 45%,#b8bcc4 100%);
-    border:1px solid rgba(255,255,255,0.5);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    flex-shrink:0;
-    position:relative;
-    transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);
-    box-shadow:
-      0 6px 18px rgba(0,0,0,0.45),
-      0 1px 0 rgba(255,255,255,0.9) inset,
-      0 -1px 0 rgba(0,0,0,0.15) inset;
-  }
-  .mp-btn::before{
-    content:'';
-    position:absolute;
-    top:0;left:0;right:0;
-    height:50%;
-    border-radius:50% 50% 0 0;
-    background:linear-gradient(180deg,rgba(255,255,255,0.7) 0%,transparent 100%);
-    pointer-events:none;
-  }
-  .mp-btn:hover{
-    transform:scale(1.08);
-    box-shadow:
-      0 8px 24px rgba(0,0,0,0.55),
-      0 1px 0 rgba(255,255,255,1) inset,
-      0 0 0 4px rgba(200,215,240,0.12);
-  }
-  .mp-btn:active{transform:scale(0.94);}
-  .mp-btn svg{
-    width:16px;
-    height:16px;
-    color:#0a0b0e;
-    position:relative;
-    z-index:1;
-    transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .mp-btn .ico-play{
-    margin-left:2px;
-    opacity:1;
-    transform:scale(1);
-  }
-  .mp-btn .ico-pause{
-    opacity:0;
-    transform:scale(0.5);
-    position:absolute;
-  }
-  .music-player.playing .mp-btn .ico-play{
-    opacity:0;
-    transform:scale(0.5);
-  }
-  .music-player.playing .mp-btn .ico-pause{
-    opacity:1;
-    transform:scale(1);
-  }
-
-  /* Barre de progression */
-  .mp-prog{
-    position:relative;
-    height:3px;
-    border-radius:3px;
-    background:rgba(255,255,255,0.08);
-    cursor:pointer;
-    overflow:visible;
-    z-index:2;
-  }
-  .mp-prog-fill{
-    position:relative;
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg,var(--accent) 0%,var(--accent-bright) 100%);
-    border-radius:3px;
-    transition:width 0.15s linear;
-  }
-  .mp-prog-fill::after{
-    content:'';
-    position:absolute;
-    right:-4px;
-    top:50%;
-    transform:translateY(-50%) scale(0.6);
-    width:9px;
-    height:9px;
-    border-radius:50%;
-    background:#fff;
-    box-shadow:
-      0 0 0 2px rgba(200,215,240,0.3),
-      0 2px 6px rgba(0,0,0,0.4);
-    transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
-    opacity:0;
-  }
-  .mp-prog:hover .mp-prog-fill::after,
-  .music-player:hover .mp-prog-fill::after{
-    transform:translateY(-50%) scale(1);
-    opacity:1;
-  }
-
-  .mp-times{
-    display:flex;
-    justify-content:space-between;
-    font-size:9.5px;
-    color:var(--text-3);
-    font-family:'JetBrains Mono',monospace;
-    letter-spacing:0.04em;
-    margin-top:6px;
-    z-index:2;
-    position:relative;
-  }
-
-  /* Responsive */
-  @media (max-width:720px){
-    .music-player{
-      bottom:16px;
-      right:14px;
-      left:14px;
-      max-width:none;
-      width:auto;
-      padding:12px 14px 10px;
-      border-radius:20px;
-    }
-    .mp-vinyl{width:40px;height:40px;}
-    .mp-vinyl img{width:20px;height:20px;}
-    .mp-title{font-size:12.5px;}
-    .mp-artist{font-size:9.5px;}
-    .mp-btn{width:40px;height:40px;}
-    .mp-btn svg{width:15px;height:15px;}
-    .mp-bars span:nth-child(5){display:none;}
-  }
-  @media (max-width:380px){
-    .mp-bars{display:none;}
-  }
-
   ::-webkit-scrollbar{width:10px;height:10px;}
   ::-webkit-scrollbar-track{background:transparent;}
   ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.10);border-radius:var(--r-pill);border:2px solid transparent;background-clip:content-box;}
   ::selection{background:var(--accent-soft);color:var(--accent-bright);}
+
+  @media (max-width:720px){
+    .topbar{top:10px;padding:6px 6px 6px 10px;gap:10px;}
+    .brand-name{font-size:13px;}
+    .brand-logo{width:28px;height:28px;border-radius:9px;}
+    .tb-link{padding:7px 11px;font-size:12px;}
+    .tb-link.optional{display:none;}
+    .wrap{padding:82px 14px 60px;}
+    .hero h1{font-size:26px;}
+    .hero p{font-size:13.5px;}
+    .stats-row{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;}
+    .stat{padding:12px 14px;}
+    .stat-value{font-size:16px;}
+    .search-card{padding:12px;}
+    .search-row{flex-direction:column;gap:10px;}
+    button.go{width:100%;height:50px;}
+    #target{font-size:16px;padding:15px 88px 15px 44px;}
+    .crit-hint{display:none;}
+    .grid-2{grid-template-columns:1fr;}
+    .card{padding:16px;}
+    .card-head{gap:12px;padding-bottom:12px;margin-bottom:12px;}
+    .av{width:44px;height:44px;font-size:15px;}
+    .card-name{font-size:15.5px;}
+    .act{width:34px;height:34px;}
+    .fields{grid-template-columns:1fr;gap:4px;}
+    .frow{flex-direction:column;align-items:flex-start;gap:4px;padding:10px 12px;}
+    .fval{text-align:left;justify-content:flex-start;width:100%;font-size:13px;}
+    .mc{opacity:1;}
+    .src-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+    .types-grid,.info-grid{grid-template-columns:1fr;}
+    .toasts{right:14px;left:14px;bottom:14px;align-items:stretch;}
+    .toast{min-width:0;max-width:100%;}
+    .ck-btns{flex-direction:column-reverse;}
+    .stop{bottom:16px;left:14px;width:42px;height:42px;}
+    footer{flex-direction:column;align-items:flex-start;}
+  }
 </style>
 </head>
 <body>
@@ -920,7 +630,7 @@
 
       <div class="faq-item">
         <div class="faq-q">Puis-je combiner plusieurs critères ?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
-        <div class="faq-a"><div class="faq-a-inner">Oui. Tous les critères remplis sont envoyés simultanément.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Oui. Tous les critères remplis sont envoyés simultanément. Plus vous en mettez, plus les résultats seront précis.</div></div>
       </div>
 
       <div class="faq-item">
@@ -952,36 +662,6 @@
 </main>
 
 <div class="toasts" id="toasts"></div>
-
-<!-- ========= MUSIC PLAYER ========= -->
-<div class="music-player" id="musicPlayer">
-  <div class="mp-head">
-    <div class="mp-vinyl">
-      <img src="/IMG_0662.jpeg" alt="">
-    </div>
-    <div class="mp-info">
-      <div class="mp-title">sometime</div>
-      <div class="mp-artist">baby hayabusa</div>
-    </div>
-    <div class="mp-bars">
-      <span></span><span></span><span></span><span></span><span></span>
-    </div>
-    <button class="mp-btn" id="musicBtn" type="button" aria-label="Lecture / Pause">
-      <svg class="ico-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20 7 4"/></svg>
-      <svg class="ico-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-    </button>
-  </div>
-  <div class="mp-prog" id="musicProgressWrap">
-    <div class="mp-prog-fill" id="musicProgress"></div>
-  </div>
-  <div class="mp-times">
-    <span id="musicCurrent">0:00</span>
-    <span id="musicDuration">0:00</span>
-  </div>
-</div>
-<audio id="musicAudio" preload="metadata" loop>
-  <source src="https://cdn.whyp.it/013399e4-94f9-409e-8472-1f39b09191a8.mp3?token=OrU2gIqCGZDsCTZvEV8BoqHWroudQosB_OYvKTlvKYs&expires=1791676800" type="audio/mpeg">
-</audio>
 
 <button class="stop" id="scrollTop" type="button" aria-label="Haut de page">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1060,6 +740,7 @@
 (function(){
   "use strict";
 
+  /* Utils */
   function $(id){ return document.getElementById(id); }
   function esc(s){
     return String(s == null ? "" : s).replace(/[&<>"']/g, function(m){
@@ -1067,6 +748,7 @@
     });
   }
 
+  /* Labels / ordre des champs */
   var LABELS = {
     _source_db:"Source", adresse:"Adresse", annee_naissance:"Année",
     code_postal:"CP", date_naissance:"Naissance", departement:"Dépt",
@@ -1092,6 +774,7 @@
     return s || null;
   }
 
+  /* Toasts */
   var toastsEl = $("toasts");
   function toast(msg, type, dur){
     type = type || "success"; dur = dur || 2600;
@@ -1108,13 +791,16 @@
     }, dur);
   }
 
+  /* Modales */
   function openModal(id){
     var e = $(id); if (!e) return;
-    e.classList.add("open"); document.body.classList.add("modal-open");
+    e.classList.add("open");
+    document.body.classList.add("modal-open");
   }
   function closeModal(id){
     var e = $(id); if (!e) return;
-    e.classList.remove("open"); document.body.classList.remove("modal-open");
+    e.classList.remove("open");
+    document.body.classList.remove("modal-open");
   }
   if ($("navAbout")) $("navAbout").addEventListener("click", function(){ openModal("aboutModal"); });
   if ($("navLegal")) $("navLegal").addEventListener("click", function(){ openModal("legalModal"); });
@@ -1126,7 +812,8 @@
   document.querySelectorAll(".mbg").forEach(function(b){
     b.addEventListener("click", function(e){
       if (e.target === b) {
-        b.classList.remove("open"); document.body.classList.remove("modal-open");
+        b.classList.remove("open");
+        document.body.classList.remove("modal-open");
       }
     });
   });
@@ -1137,12 +824,16 @@
     }
   });
 
+  /* FAQ — accordéon */
   document.querySelectorAll(".faq-item").forEach(function(it){
     var q = it.querySelector(".faq-q");
     if (!q) return;
-    q.addEventListener("click", function(){ it.classList.toggle("open"); });
+    q.addEventListener("click", function(){
+      it.classList.toggle("open");
+    });
   });
 
+  /* Cookies */
   (function(){
     var b = $("cookieBanner"); if (!b) return;
     var c = null; try { c = localStorage.getItem("vx-ck"); } catch(e){}
@@ -1153,12 +844,13 @@
       setTimeout(function(){ b.remove(); }, 500);
       toast(v === "a" ? "Préférences enregistrées" : "Refus enregistré", "success", 1500);
     }
-    if ($("cookieAccept")) $("cookieAccept").addEventListener("click", function(){ dis("a"); });
-    if ($("cookieRefuse")) $("cookieRefuse").addEventListener("click", function(){ dis("r"); });
+    var acc = $("cookieAccept"); if (acc) acc.addEventListener("click", function(){ dis("a"); });
+    var ref = $("cookieRefuse"); if (ref) ref.addEventListener("click", function(){ dis("r"); });
     var ll = $("cookieLegalLink");
     if (ll) ll.addEventListener("click", function(e){ e.preventDefault(); openModal("legalModal"); });
   })();
 
+  /* Scroll top */
   var stop = $("scrollTop");
   if (stop) {
     window.addEventListener("scroll", function(){
@@ -1169,77 +861,7 @@
     });
   }
 
-  /* ============ MUSIC PLAYER ============ */
-  (function(){
-    var wrap = $("musicPlayer");
-    var audio = $("musicAudio");
-    var btn = $("musicBtn");
-    var fill = $("musicProgress");
-    var wrapProg = $("musicProgressWrap");
-    var tCur = $("musicCurrent");
-    var tDur = $("musicDuration");
-    if (!audio || !btn || !wrap) return;
-
-    function fmt(s){
-      if (!s || isNaN(s) || !isFinite(s)) return "0:00";
-      var m = Math.floor(s / 60);
-      var sec = Math.floor(s % 60);
-      return m + ":" + (sec < 10 ? "0" : "") + sec;
-    }
-
-    function updateProgress(){
-      if (!audio.duration || isNaN(audio.duration)) return;
-      var p = (audio.currentTime / audio.duration) * 100;
-      if (fill) fill.style.width = p + "%";
-      if (tCur) tCur.textContent = fmt(audio.currentTime);
-    }
-
-    btn.addEventListener("click", function(){
-      if (audio.paused) {
-        audio.play().catch(function(err){
-          console.warn("Play error:", err);
-        });
-      } else {
-        audio.pause();
-      }
-    });
-
-    // Clic sur la barre = seek
-    if (wrapProg) {
-      wrapProg.addEventListener("click", function(e){
-        if (!audio.duration || isNaN(audio.duration)) return;
-        var rect = wrapProg.getBoundingClientRect();
-        var x = (e.clientX - rect.left) / rect.width;
-        x = Math.max(0, Math.min(1, x));
-        audio.currentTime = x * audio.duration;
-        updateProgress();
-      });
-    }
-
-    audio.addEventListener("play", function(){
-      wrap.classList.add("playing");
-      btn.setAttribute("aria-label", "Pause");
-    });
-    audio.addEventListener("pause", function(){
-      wrap.classList.remove("playing");
-      btn.setAttribute("aria-label", "Lecture");
-    });
-    audio.addEventListener("loadedmetadata", function(){
-      if (tDur) tDur.textContent = fmt(audio.duration);
-    });
-    audio.addEventListener("timeupdate", updateProgress);
-    audio.addEventListener("ended", function(){
-      wrap.classList.remove("playing");
-      if (fill) fill.style.width = "0%";
-      if (tCur) tCur.textContent = "0:00";
-    });
-
-    // Met à jour la durée si pas encore chargée
-    if (audio.readyState >= 1 && tDur) {
-      tDur.textContent = fmt(audio.duration);
-    }
-  })();
-
+  /* Input */
   var input = $("target");
   var inputX = $("inputX");
   var badge = $("inputBadge");
@@ -1256,26 +878,25 @@
   }
 
   function updateBadge(){
-    if (!input || !badge) return;
     var t = detectType(input.value);
     if (t && input.value.trim().length > 2) {
       badge.textContent = TYPE_LABELS[t];
       badge.classList.add("visible");
-      if (inputX) inputX.classList.remove("visible");
+      inputX.classList.remove("visible");
     } else {
       badge.classList.remove("visible");
-      if (inputX) inputX.classList.toggle("visible", input.value.length > 0);
+      inputX.classList.toggle("visible", input.value.length > 0);
     }
   }
 
-  if (input) input.addEventListener("input", updateBadge);
-  if (inputX) inputX.addEventListener("click", function(){
-    if (!input) return;
+  input.addEventListener("input", updateBadge);
+  inputX.addEventListener("click", function(){
     input.value = "";
     updateBadge();
     input.focus();
   });
 
+  /* Critères */
   var FILTERS = {
     ville:"f_ville", code_postal:"f_code_postal", departement:"f_departement",
     pays:"f_pays", adresse:"f_adresse", adresse_ip:"f_adresse_ip",
@@ -1295,9 +916,9 @@
   function updateFiltersCount(){
     var n = Object.keys(readFilters()).length;
     var c = $("filtersCount"), h = $("filtersHint");
-    if (!c || !h) return;
     if (n > 0) {
-      c.textContent = n; c.style.display = "inline-flex";
+      c.textContent = n;
+      c.style.display = "inline-flex";
       h.textContent = n + " critère" + (n>1?"s":"") + " actif" + (n>1?"s":"");
     } else {
       c.style.display = "none";
@@ -1326,11 +947,11 @@
   if ($("filtersToggle")) $("filtersToggle").addEventListener("click", function(){
     var body = $("filtersBody");
     var tg = $("filtersToggle");
-    if (!body || !tg) return;
     body.classList.toggle("open");
     tg.classList.toggle("open");
   });
 
+  /* Requête HTTP — endpoint /api/search */
   var ENDPOINT = "/api/search";
 
   function httpGet(params){
@@ -1360,6 +981,7 @@
     });
   }
 
+  /* Extraction tableau */
   function findArray(o, depth){
     depth = depth || 0;
     if (depth > 6 || !o) return null;
@@ -1378,8 +1000,9 @@
     return null;
   }
 
+  /* Construction payload */
   function buildParams(){
-    var v = input ? input.value.trim() : "";
+    var v = input.value.trim();
     var f = readFilters();
     var p = {};
     var t = detectType(v);
@@ -1396,8 +1019,9 @@
     return p;
   }
 
+  /* Validation */
   function validate(){
-    var v = input ? (input.value || "").trim() : "";
+    var v = (input.value || "").trim();
     var hasF = Object.keys(readFilters()).length > 0;
     if (v.length === 0 && hasF) return true;
     if (v.length < 3) return false;
@@ -1411,6 +1035,7 @@
     return false;
   }
 
+  /* Copie */
   function copyText(txt){
     if (navigator.clipboard && window.isSecureContext) {
       return navigator.clipboard.writeText(txt).then(function(){ return true; }, function(){ return fallback(txt); });
@@ -1419,8 +1044,11 @@
     function fallback(t){
       try {
         var ta = document.createElement("textarea");
-        ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
-        document.body.appendChild(ta); ta.select();
+        ta.value = t;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
         var ok = document.execCommand("copy");
         document.body.removeChild(ta);
         return ok;
@@ -1428,6 +1056,7 @@
     }
   }
 
+  /* Export JSON */
   function exportJSON(it, idx){
     var clean = {};
     Object.keys(it).forEach(function(k){
@@ -1440,13 +1069,17 @@
     var p2 = (it.nom_famille || "").toString().toLowerCase().replace(/\s+/g,"-");
     a.href = u;
     a.download = "vx-" + (p1 || "r") + "-" + (p2 || (idx+1)) + ".json";
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(u);
     toast("Fichier exporté", "success", 1500);
   }
 
+  /* Dédup */
   function groupDup(items){
-    var gs = []; var used = {};
+    var gs = [];
+    var used = {};
     function keysOf(it){
       var k = [];
       if (it.email) k.push("e:" + String(it.email).toLowerCase());
@@ -1459,7 +1092,8 @@
     }
     items.forEach(function(it, ix){
       if (used[ix]) return;
-      var g = [it]; used[ix] = true;
+      var g = [it];
+      used[ix] = true;
       var mk = keysOf(it);
       items.forEach(function(o, jx){
         if (jx === ix || used[jx]) return;
@@ -1472,6 +1106,7 @@
     return gs;
   }
 
+  /* Rendu carte */
   function renderCard(it, idx, dc){
     dc = dc || 0;
     var pr = it.prenom || it.first_name || "";
@@ -1537,8 +1172,9 @@
     '</div>';
   }
 
+  /* Skeletons */
   function renderSkeletons(){
-    var out = $("out"); if (!out) return;
+    var out = $("out");
     var h = '<div class="res-header"><div class="res-count">Recherche<b>…</b></div><div class="res-meta">requête envoyée</div></div><div class="skels">';
     for (var i = 0; i < 3; i++){
       h += '<div class="skel"><div class="skel-av"></div><div class="skel-body"><div class="skel-ln h13 w40"></div><div class="skel-ln w60"></div><div class="skel-ln w85"></div><div class="skel-ln w50"></div></div></div>';
@@ -1547,13 +1183,15 @@
     out.innerHTML = h;
   }
 
+  /* Empty state */
   function renderEmpty(msg){
-    var out = $("out"); if (!out) return;
+    var out = $("out");
     out.innerHTML = '<div class="res-header"><div class="res-count">Aucun résultat</div><div class="res-meta">0 entrée</div></div>' +
       '<div class="empty"><div class="empty-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>' +
       '<h3>Rien à afficher</h3><p>' + esc(msg || "Aucun résultat ne correspond. Essayez d'autres termes ou retirez des critères.") + '</p></div>';
   }
 
+  /* Actions cartes */
   var currentItems = [];
   function bindCards(list){
     list.querySelectorAll(".mc").forEach(function(b){
@@ -1579,20 +1217,20 @@
     });
   }
 
+  /* Bouton rechercher */
   var goBtn = $("go");
-  var goLbl = goBtn ? goBtn.querySelector(".lbl") : null;
+  var goLbl = goBtn.querySelector(".lbl");
 
   function setLoading(on){
-    if (!goBtn || !goLbl) return;
     goBtn.disabled = on;
     goBtn.classList.toggle("loading", on);
     goLbl.textContent = on ? "…" : "Rechercher";
   }
 
-  if (goBtn) goBtn.addEventListener("click", function(){
+  goBtn.addEventListener("click", function(){
     if (!validate()) {
       toast("Entrée invalide — 3 caractères minimum", "error", 2200);
-      if (input) input.focus();
+      input.focus();
       return;
     }
 
@@ -1650,13 +1288,14 @@
     });
   });
 
-  if (input) input.addEventListener("keydown", function(e){
+  input.addEventListener("keydown", function(e){
     if (e.key === "Enter") {
       e.preventDefault();
-      if (goBtn) goBtn.click();
+      goBtn.click();
     }
   });
 
+  /* Init */
   updateFiltersCount();
   updateBadge();
 
