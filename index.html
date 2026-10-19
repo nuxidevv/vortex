@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d0620">
+<meta name="robots" content="noindex, nofollow">
+<title>Vortex — Maintenance</title>
+<link rel="icon" type="image/jpeg" href="/IMG_0662.jpeg">
+<link rel="apple-touch-icon" href="/IMG_0662.jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  :root{
+    --bg:#0d0620;
+    --glass:rgba(180,140,255,0.06);
+    --glass-2:rgba(180,140,255,0.09);
+    --glass-border:rgba(180,140,255,0.16);
+    --glass-border-2:rgba(200,160,255,0.28);
+    --text:#f0e8ff;
+    --text-2:#b8a5d9;
+    --text-3:#7a6a9e;
+    --text-4:#4a3d6b;
+    --accent:#b794f6;
+    --accent-bright:#e0d0ff;
+    --emerald:#7fe8c4;
+    --rose:#f58fa8;
+  }
+  html,body{height:100%;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    overflow:hidden;
+    position:relative;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ========== BACKGROUND GALAXIE ========== */
+  .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+
+  .blob{position:absolute;border-radius:50%;filter:blur(120px);will-change:transform;}
+  .blob.b1{
+    width:70vmax;height:70vmax;top:-30vmax;left:-25vmax;
+    background:radial-gradient(circle,rgba(140,80,220,0.40) 0%,rgba(120,60,200,0.15) 35%,transparent 70%);
+    animation:drift1 34s ease-in-out infinite;
+  }
+  .blob.b2{
+    width:65vmax;height:65vmax;bottom:-30vmax;right:-25vmax;
+    background:radial-gradient(circle,rgba(220,90,220,0.32) 0%,rgba(180,70,200,0.12) 35%,transparent 70%);
+    animation:drift2 40s ease-in-out infinite;
+  }
+  .blob.b3{
+    width:55vmax;height:55vmax;top:30%;left:38%;
+    background:radial-gradient(circle,rgba(100,80,240,0.30) 0%,rgba(80,60,200,0.10) 35%,transparent 70%);
+    animation:drift3 46s ease-in-out infinite;
+  }
+  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(10vmax,5vmax) scale(1.1);}66%{transform:translate(-5vmax,10vmax) scale(0.95);}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-8vmax,-6vmax) scale(1.15);}}
+  @keyframes drift3{0%,100%{transform:translate(-50%,-50%) scale(1);}50%{transform:translate(-42%,-58%) scale(1.2);}}
+
+  .aurora{
+    position:absolute;inset:-50%;
+    background:conic-gradient(from 0deg at 50% 50%,
+      rgba(180,120,255,0.14) 0deg,
+      rgba(120,90,240,0.06) 45deg,
+      rgba(230,120,255,0.14) 90deg,
+      rgba(140,80,220,0.08) 135deg,
+      rgba(200,140,255,0.16) 180deg,
+      rgba(120,90,240,0.06) 225deg,
+      rgba(230,120,255,0.12) 270deg,
+      rgba(160,100,240,0.08) 315deg,
+      rgba(180,120,255,0.14) 360deg);
+    filter:blur(100px);
+    animation:rotate 120s linear infinite;
+    opacity:0.7;
+    mix-blend-mode:screen;
+    pointer-events:none;
+  }
+  @keyframes rotate{to{transform:rotate(360deg);}}
+
+  .grid{
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(180,140,255,0.035) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(180,140,255,0.035) 1px,transparent 1px);
+    background-size:60px 60px;
+    mask-image:radial-gradient(ellipse 90% 75% at 50% 45%,#000 15%,transparent 85%);
+    -webkit-mask-image:radial-gradient(ellipse 90% 75% at 50% 45%,#000 15%,transparent 85%);
+  }
+
+  .stars{position:absolute;inset:0;pointer-events:none;}
+  .stars::before,.stars::after{
+    content:'';position:absolute;inset:0;
+    background-image:
+      radial-gradient(1px 1px at 12% 18%, rgba(220,190,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 28% 42%, rgba(200,170,255,0.7) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 45% 12%, rgba(230,180,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 62% 66%, rgba(220,190,255,0.8) 0%, transparent 100%),
+      radial-gradient(1px 1px at 78% 28%, rgba(200,170,255,0.7) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 88% 72%, rgba(240,200,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 8% 82%, rgba(220,180,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 52% 88%, rgba(220,190,255,0.7) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 22% 58%, rgba(200,170,255,0.8) 0%, transparent 100%),
+      radial-gradient(1px 1px at 72% 48%, rgba(230,180,255,0.7) 0%, transparent 100%);
+    background-size:100% 100%;
+    animation:twinkle 4s ease-in-out infinite;
+  }
+  .stars::after{
+    background-image:
+      radial-gradient(1px 1px at 5% 35%, rgba(255,220,255,0.7) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 35% 78%, rgba(220,190,255,0.8) 0%, transparent 100%),
+      radial-gradient(1px 1px at 58% 22%, rgba(240,200,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 82% 55%, rgba(220,190,255,0.8) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 92% 12%, rgba(255,220,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 42% 38%, rgba(200,170,255,0.6) 0%, transparent 100%);
+    animation-delay:2s;
+  }
+  @keyframes twinkle{0%,100%{opacity:0.7;}50%{opacity:1;}}
+
+  .grain{
+    position:absolute;inset:0;opacity:0.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  #fxCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.95;}
+
+  /* ========== CARTE MAINTENANCE ========== */
+  .card{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width:480px;
+    border-radius:32px;
+    background:linear-gradient(135deg,rgba(60,30,120,0.55) 0%,rgba(30,15,60,0.65) 100%);
+    border:1px solid var(--glass-border-2);
+    backdrop-filter:blur(48px) saturate(200%);
+    -webkit-backdrop-filter:blur(48px) saturate(200%);
+    box-shadow:
+      0 40px 100px rgba(0,0,0,0.7),
+      0 1px 0 rgba(200,160,255,0.25) inset,
+      0 -1px 0 rgba(0,0,0,0.4) inset,
+      0 0 120px -20px rgba(180,130,255,0.5);
+    padding:44px 32px 36px;
+    text-align:center;
+    overflow:hidden;
+    animation:cardIn 0.8s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes cardIn{
+    from{opacity:0;transform:translateY(30px) scale(0.94);}
+    to{opacity:1;transform:translateY(0) scale(1);}
+  }
+  .card::before{
+    content:'';
+    position:absolute;
+    top:0;left:0;right:0;
+    height:50%;
+    border-radius:32px 32px 0 0;
+    background:linear-gradient(180deg,rgba(200,160,255,0.12) 0%,transparent 100%);
+    pointer-events:none;
+  }
+  .card::after{
+    content:'';
+    position:absolute;
+    top:-50%;left:-50%;
+    width:200%;height:200%;
+    background:radial-gradient(circle at 30% 20%,rgba(200,150,255,0.15) 0%,transparent 50%);
+    pointer-events:none;
+    animation:cardGlow 8s ease-in-out infinite;
+  }
+  @keyframes cardGlow{
+    0%,100%{transform:translate(0,0);opacity:0.6;}
+    50%{transform:translate(10%,10%);opacity:1;}
+  }
+  .card > *{position:relative;z-index:2;}
+
+  /* Logo */
+  .logo{
+    width:88px;height:88px;
+    border-radius:24px;
+    overflow:hidden;
+    margin:0 auto 28px;
+    position:relative;
+    border:1px solid rgba(200,160,255,0.35);
+    box-shadow:
+      0 12px 40px rgba(139,92,246,0.6),
+      0 0 0 1px rgba(255,255,255,0.15) inset,
+      0 1px 0 rgba(255,200,255,0.4) inset,
+      0 0 60px -10px rgba(180,130,255,0.8);
+    animation:logoFloat 4s ease-in-out infinite;
+  }
+  @keyframes logoFloat{
+    0%,100%{transform:translateY(0) rotate(0deg);}
+    50%{transform:translateY(-6px) rotate(-2deg);}
+  }
+  .logo::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:linear-gradient(135deg,transparent 40%,rgba(255,220,255,0.4) 50%,transparent 60%);
+    animation:shimmer 4s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes shimmer{
+    0%{transform:translateX(-100%);}
+    100%{transform:translateX(100%);}
+  }
+  .logo img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1;}
+
+  /* Badge maintenance */
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 14px;
+    border-radius:100px;
+    background:rgba(245,143,168,0.10);
+    border:1px solid rgba(245,143,168,0.30);
+    font-size:11px;
+    font-weight:600;
+    color:var(--rose);
+    margin-bottom:20px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    box-shadow:0 0 20px -6px rgba(245,143,168,0.5);
+  }
+  .badge .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--rose);
+    box-shadow:0 0 10px var(--rose);
+    animation:pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;transform:scale(1);}
+    50%{opacity:0.5;transform:scale(0.75);}
+  }
+
+  h1{
+    font-size:32px;
+    font-weight:800;
+    letter-spacing:-0.03em;
+    line-height:1.15;
+    color:var(--text);
+    margin-bottom:14px;
+  }
+  h1 .grad{
+    background:linear-gradient(120deg,#e0d0ff 0%,#b794f6 35%,#e879f9 70%,#e0d0ff 100%);
+    background-size:200% 100%;
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    color:transparent;
+    animation:gradFlow 6s ease-in-out infinite;
+    filter:drop-shadow(0 0 20px rgba(183,148,246,0.5));
+  }
+  @keyframes gradFlow{
+    0%,100%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+  }
+
+  p.desc{
+    font-size:14px;
+    color:var(--text-2);
+    line-height:1.65;
+    max-width:360px;
+    margin:0 auto 28px;
+  }
+
+  /* Barre de progression de maintenance */
+  .progress-box{
+    background:rgba(20,10,40,0.6);
+    border:1px solid var(--glass-border);
+    border-radius:14px;
+    padding:14px 16px;
+    margin-bottom:26px;
+    text-align:left;
+  }
+  .progress-label{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:10.5px;
+    color:var(--text-3);
+    text-transform:uppercase;
+    letter-spacing:0.10em;
+    font-weight:700;
+    font-family:'JetBrains Mono',monospace;
+    margin-bottom:10px;
+  }
+  .progress-label .status{
+    color:var(--emerald);
+    display:flex;
+    align-items:center;
+    gap:5px;
+  }
+  .progress-label .status::before{
+    content:'';
+    width:5px;height:5px;
+    border-radius:50%;
+    background:var(--emerald);
+    box-shadow:0 0 8px var(--emerald);
+    animation:pulse 1.6s ease-in-out infinite;
+  }
+  .progress-bar{
+    height:6px;
+    background:rgba(180,140,255,0.10);
+    border-radius:100px;
+    overflow:hidden;
+    position:relative;
+  }
+  .progress-fill{
+    height:100%;
+    width:0%;
+    border-radius:100px;
+    background:linear-gradient(90deg,#b794f6,#e879f9,#b794f6);
+    background-size:200% 100%;
+    animation:fillUp 3s cubic-bezier(0.4,0,0.2,1) forwards, flowBar 2s linear infinite;
+    box-shadow:0 0 15px rgba(183,148,246,0.6);
+  }
+  @keyframes fillUp{
+    from{width:0%;}
+    to{width:72%;}
+  }
+  @keyframes flowBar{
+    0%{background-position:0% 0;}
+    100%{background-position:200% 0;}
+  }
+
+  /* Bouton Discord */
+  .discord-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    width:100%;
+    padding:16px 24px;
+    border-radius:16px;
+    background:linear-gradient(180deg,#7c8ef8 0%,#5865F2 55%,#4752c4 100%);
+    border:1px solid rgba(140,150,255,0.5);
+    color:#ffffff;
+    font-family:inherit;
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:0.01em;
+    cursor:pointer;
+    text-decoration:none;
+    transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    position:relative;
+    overflow:hidden;
+    box-shadow:
+      0 8px 24px rgba(88,101,242,0.5),
+      0 1px 0 rgba(255,255,255,0.3) inset,
+      0 -1px 0 rgba(0,0,0,0.2) inset;
+  }
+  .discord-btn::before{
+    content:'';
+    position:absolute;
+    top:0;left:0;right:0;
+    height:50%;
+    background:linear-gradient(180deg,rgba(255,255,255,0.25) 0%,transparent 100%);
+    border-radius:16px 16px 0 0;
+    pointer-events:none;
+  }
+  .discord-btn::after{
+    content:'';
+    position:absolute;
+    top:0;left:-100%;
+    width:100%;height:100%;
+    background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.4) 50%,transparent 100%);
+    transition:left 0.7s cubic-bezier(0.4,0,0.2,1);
+    pointer-events:none;
+  }
+  .discord-btn:hover::after{left:100%;}
+  .discord-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:
+      0 14px 40px rgba(88,101,242,0.7),
+      0 1px 0 rgba(255,255,255,0.4) inset,
+      0 0 60px -10px rgba(88,101,242,0.8);
+  }
+  .discord-btn:active{
+    transform:translateY(0) scale(0.98);
+  }
+  .discord-btn svg{
+    width:20px;height:20px;
+    flex-shrink:0;
+    position:relative;z-index:2;
+  }
+  .discord-btn .label{position:relative;z-index:2;}
+
+  /* Footer note */
+  .note{
+    margin-top:22px;
+    font-size:11.5px;
+    color:var(--text-3);
+    line-height:1.6;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .note strong{color:var(--text-2);font-weight:600;}
+
+  /* Petites étoiles décoratives */
+  .deco{
+    position:absolute;
+    font-size:14px;
+    opacity:0.6;
+    animation:twinkleStar 3s ease-in-out infinite;
+    pointer-events:none;
+  }
+  .deco.d1{top:20px;right:30px;animation-delay:0s;}
+  .deco.d2{top:80px;left:24px;animation-delay:0.8s;}
+  .deco.d3{bottom:60px;right:40px;animation-delay:1.5s;}
+  @keyframes twinkleStar{
+    0%,100%{opacity:0.3;transform:scale(0.8) rotate(0deg);}
+    50%{opacity:1;transform:scale(1.15) rotate(20deg);}
+  }
+
+  @media (max-width:480px){
+    body{padding:16px;}
+    .card{padding:36px 24px 28px;border-radius:26px;}
+    .logo{width:72px;height:72px;border-radius:20px;margin-bottom:22px;}
+    h1{font-size:26px;}
+    p.desc{font-size:13px;}
+    .progress-box{padding:12px 14px;margin-bottom:22px;}
+    .discord-btn{padding:15px 20px;font-size:13px;}
+    .note{font-size:11px;}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{
+      animation-duration:0.01ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="aurora"></div>
+  <div class="stars"></div>
+  <div class="grid"></div>
+  <canvas id="fxCanvas"></canvas>
+  <div class="grain"></div>
+</div>
+
+<div class="card">
+  <span class="deco d1">✦</span>
+  <span class="deco d2">✧</span>
+  <span class="deco d3">✦</span>
+
+  <div class="logo">
+    <img src="/IMG_0662.jpeg" alt="Vortex">
+  </div>
+
+  <div class="badge">
+    <span class="dot"></span>
+    Maintenance en cours
+  </div>
+
+  <h1>
+    On revient<br>
+    <span class="grad">très vite.</span>
+  </h1>
+
+  <p class="desc">
+    Vortex est temporairement indisponible le temps d'une mise à jour. Nos serveurs se préparent pour la suite.
+  </p>
+
+  <div class="progress-box">
+    <div class="progress-label">
+      <span>Rétablissement du service</span>
+      <span class="status">Actif</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+  </div>
+
+  <a class="discord-btn" href="https://discord.gg/MtNaeRyAwS" target="_blank" rel="noopener noreferrer">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+    </svg>
+    <span class="label">Rejoindre le Discord</span>
+  </a>
+
+  <div class="note">
+    Suivez l'avancement en direct sur notre <strong>Discord</strong>.
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* Particules 3D violettes en fond */
+  var canvas = document.getElementById("fxCanvas");
+  if (!canvas) return;
+  var ctx = canvas.getContext("2d");
+  var w, h, dpr;
+  var particles = [];
+  var NUM = 80;
+  var FOV = 320;
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    spawn();
+  }
+
+  function spawn(){
+    particles = [];
+    for (var i = 0; i < NUM; i++){
+      particles.push({
+        x: (Math.random() - 0.5) * 1800,
+        y: (Math.random() - 0.5) * 1800,
+        z: Math.random() * 1800 + 10,
+        size: Math.random() * 1.6 + 0.4,
+        speed: Math.random() * 0.6 + 0.4,
+        hue: Math.random() > 0.6 ? "magenta" : "violet"
+      });
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, w, h);
+    particles.sort(function(a, b){ return b.z - a.z; });
+
+    for (var i = 0; i < particles.length; i++){
+      var p = particles[i];
+      p.z -= p.speed;
+      if (p.z < 5) {
+        p.z = 1800;
+        p.x = (Math.random() - 0.5) * 1800;
+        p.y = (Math.random() - 0.5) * 1800;
+      }
+      var scale = FOV / p.z;
+      var px = p.x * scale + w / 2;
+      var py = p.y * scale + h / 2;
+      var r = p.size * scale;
+      if (px < -60 || px > w + 60 || py < -60 || py > h + 60) continue;
+      if (r < 0.2 || r > 4) continue;
+
+      var alpha = Math.min(1, (1 - p.z / 2000)) * 0.75;
+      var color = p.hue === "magenta"
+        ? "rgba(230,150,255," + alpha + ")"
+        : "rgba(200,170,255," + alpha + ")";
+
+      if (r > 1.5) {
+        var grad = ctx.createRadialGradient(px, py, 0, px, py, r * 3);
+        grad.addColorStop(0, color);
+        grad.addColorStop(1, "rgba(180,140,255,0)");
+        ctx.beginPath();
+        ctx.arc(px, py, r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+
+      ctx.beginPath();
+      ctx.arc(px, py, Math.max(0.25, r), 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  var rTimer;
+  window.addEventListener("resize", function(){
+    clearTimeout(rTimer);
+    rTimer = setTimeout(resize, 150);
+  });
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
