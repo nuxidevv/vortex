@@ -1,18 +1,42 @@
 import https from "https";
 
-const BRIXHUB_URL = "https://api.brixhub.ru/api/v1/search";
+const BLOCKED_B64 = ["eGhhZmVyaQ==", "bnVoaQ=="];
+
+function isBlockedSearch(firstName, lastName) {
+  const words = [];
+  if (firstName) words.push(firstName);
+  if (lastName) words.push(lastName);
+  const fullName = [firstName, lastName].filter(Boolean).join(" ");
+  if (fullName) {
+    const parts = fullName.split(/\s+/);
+    for (let i = 0; i < parts.length; i++) {
+      if (parts[i]) words.push(parts[i]);
+    }
+  }
+  
+  const blockedWords = BLOCKED_B64.map(function(b) {
+    return Buffer.from(b, "base64").toString("utf8").toLowerCase();
+  });
+
+  for (let j = 0; j < words.length; j++) {
+    const w = String(words[j]).toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]/g, "");
+    if (blockedWords.indexOf(w) !== -1) return true;
+  }
+  return false;
+}
+// ==========================================
+
+const VORTEX_URL = "https://api.brixhub.ru/api/v1/search";
 
 const BLOCKED_TARGETS = [
   { prenom: "leo",    nom: "roman" },
   { prenom: "lucile", nom: "roman" },
   { prenom: "jimmy",  nom: "roman" },
-  { prenom: "tom",    nom: "roman" },
-  { prenom: "nuhi",   nom: "xhaferi" }
+  { prenom: "tom",    nom: "roman" }
 ];
-
-// Noms de famille bloqués — toute personne avec ce nom de famille
-// sera retirée des résultats ET toute requête contenant ce nom sera bloquée
-const BLOCKED_LAST_NAMES = ["xhaferi"];
 
 function normalizeName(s) {
   return String(s || "")
@@ -37,61 +61,6 @@ function isBlocked(fullName) {
     if (hasPrenomComplet && hasNomTronque) return true;
     return false;
   });
-}
-
-// Vérifie si une chaîne (requête, email, téléphone) contient un nom de famille bloqué
-function queryContainsBlockedLastName(query) {
-  const norm = normalizeName(query);
-  if (!norm) return false;
-  const tokens = norm.split(" ").filter(t => t.length > 0);
-  return BLOCKED_LAST_NAMES.some(blocked => {
-    const b = normalizeName(blocked);
-    return tokens.some(tok => tok === b);
-  });
-}
-
-// Vérifie si un résultat a un nom de famille bloqué
-function hasBlockedLastName(item) {
-  if (!item || typeof item !== "object") return false;
-
-  // Vérification directe du nom de famille
-  const lastName = normalizeName(item.nom_famille || item.last_name || "");
-  if (lastName) {
-    return BLOCKED_LAST_NAMES.some(blocked => lastName === normalizeName(blocked));
-  }
-
-  // Fallback : vérifier le nom d'affichage
-  const displayName = normalizeName(item.nom_affichage || item.name || "");
-  if (displayName) {
-    const tokens = displayName.split(" ").filter(t => t.length > 0);
-    return BLOCKED_LAST_NAMES.some(blocked => tokens.includes(normalizeName(blocked)));
-  }
-
-  return false;
-}
-
-// Filtre récursivement la réponse pour retirer les personnes bloquées
-function filterResults(data) {
-  if (!data || typeof data !== "object") return data;
-
-  function walk(obj, depth = 0) {
-    if (depth > 8 || !obj) return obj;
-    if (Array.isArray(obj)) {
-      return obj
-        .filter(item => !hasBlockedLastName(item))
-        .map(item => walk(item, depth + 1));
-    }
-    if (typeof obj === "object") {
-      const result = {};
-      for (const key of Object.keys(obj)) {
-        result[key] = walk(obj[key], depth + 1);
-      }
-      return result;
-    }
-    return obj;
-  }
-
-  return walk(data);
 }
 
 function httpsPost(url, headers, bodyObj) {
@@ -133,11 +102,9 @@ function emptyResponse(a, b) {
   };
 }
 
-async function tryBrixhub(payload) {
+async function tryVortex(payload) {
   const headers = { "Accept": "application/json" };
-  const KEY = process.env.BRIXHUB_KEY || "";
-  if (KEY) headers["X-API-Key"] = KEY;
-  const r = await httpsPost(BRIXHUB_URL, headers, payload);
+  const r = await httpsPost(VORTEX_URL, headers, payload);
   let parsed = null;
   try { parsed = JSON.parse(r.body); } catch { parsed = r.body; }
   return { ok: r.status >= 200 && r.status < 300, status: r.status, error: r.error || null, data: parsed };
@@ -154,13 +121,11 @@ function countResults(data) {
 }
 
 function respond(res, result) {
-  // Filtrage AVANT envoi au client
-  const filtered = filterResults(result.data);
   return res.status(200).json({
     ok: result.ok,
     status: result.status,
     error: result.error || null,
-    data: filtered
+    data: result.data
   });
 }
 
@@ -200,56 +165,43 @@ export default async function handler(req, res) {
     _confidence = ""
   } = req.query;
 
+  // ====== NOUVEAU BLOCAGE (Xhaferi, Nuhi) ======
+  if (isBlockedSearch(first_name, last_name)) {
+    return res.status(200).json(emptyResponse(first_name, last_name));
+  }
+  // ============================================
+
   const filters = {
-    ville,
-    code_postal,
-    departement,
-    pays,
-    adresse,
-    adresse_ip,
-    discord_id,
-    iban,
-    bic,
-    annee_naissance,
-    genre,
-    _confidence
+    ville, code_postal, departement, pays, adresse,
+    adresse_ip, discord_id, iban, bic,
+    annee_naissance, genre, _confidence
   };
+
+  const isEmailSearch = String(email).trim().length > 0;
+  const isPhoneSearch = String(telephone).trim().length > 0;
+
+  if (isEmailSearch) {
+    const r = await tryVortex(mergeFilters({ email: String(email).trim() }, filters));
+    return respond(res, r);
+  }
+
+  if (isPhoneSearch) {
+    const cleanPhone = String(telephone).replace(/[\s.\-()]/g, "").trim();
+    const r = await tryVortex(mergeFilters({ telephone: cleanPhone }, filters));
+    return respond(res, r);
+  }
 
   const a = String(first_name).trim();
   const b = String(last_name).trim();
+
   const fullQuery = [a, b].filter(Boolean).join(" ").trim();
-  const emailStr = String(email).trim();
-  const phoneStr = String(telephone).trim();
-
-  // ===== BLOCAGES INVISIBLES CÔTÉ CLIENT =====
-  // 1. Requête contenant un nom de famille bloqué (ex: "Xhaferi")
-  if (
-    queryContainsBlockedLastName(fullQuery) ||
-    queryContainsBlockedLastName(emailStr) ||
-    queryContainsBlockedLastName(phoneStr)
-  ) {
-    return res.status(200).json(emptyResponse(a, b));
-  }
-
-  // 2. Cible précise bloquée (ex: "Nuhi Xhaferi")
-  if (fullQuery.length >= 2 && isBlocked(fullQuery)) {
-    return res.status(200).json(emptyResponse(a, b));
-  }
-
-  if (emailStr.length > 0) {
-    const r = await tryBrixhub(mergeFilters({ email: emailStr }, filters));
-    return respond(res, r);
-  }
-
-  if (phoneStr.length > 0) {
-    const cleanPhone = phoneStr.replace(/[\s.\-()]/g, "").trim();
-    const r = await tryBrixhub(mergeFilters({ telephone: cleanPhone }, filters));
-    return respond(res, r);
-  }
-
   const hasFilters = Object.values(filters).some(v => String(v).trim() !== "");
 
   if (fullQuery.length < 2 && !hasFilters) {
+    return res.status(200).json(emptyResponse(a, b));
+  }
+
+  if (fullQuery.length >= 2 && isBlocked(fullQuery)) {
     return res.status(200).json(emptyResponse(a, b));
   }
 
@@ -257,33 +209,29 @@ export default async function handler(req, res) {
   const hasB = b.length > 0;
 
   if (hasA && hasB) {
-    const firstResult = await tryBrixhub(mergeFilters({ prenom: a, nom_famille: b }, filters));
-
+    const firstResult = await tryVortex(mergeFilters({ prenom: a, nom_famille: b }, filters));
     if (firstResult.ok && countResults(firstResult.data) > 0) {
       return respond(res, firstResult);
     }
-
-    const secondResult = await tryBrixhub(mergeFilters({ prenom: b, nom_famille: a }, filters));
-
+    const secondResult = await tryVortex(mergeFilters({ prenom: b, nom_famille: a }, filters));
     if (secondResult.ok && countResults(secondResult.data) > 0) {
       return respond(res, secondResult);
     }
-
     return respond(res, secondResult || firstResult);
   }
 
   if (hasA) {
-    const r = await tryBrixhub(mergeFilters({ prenom: a }, filters));
+    const r = await tryVortex(mergeFilters({ prenom: a }, filters));
     return respond(res, r);
   }
 
   if (hasB) {
-    const r = await tryBrixhub(mergeFilters({ prenom: b }, filters));
+    const r = await tryVortex(mergeFilters({ prenom: b }, filters));
     return respond(res, r);
   }
 
   if (hasFilters) {
-    const r = await tryBrixhub(mergeFilters({}, filters));
+    const r = await tryVortex(mergeFilters({}, filters));
     return respond(res, r);
   }
 
