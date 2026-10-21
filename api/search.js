@@ -29,7 +29,7 @@ function isBlockedSearch(firstName, lastName) {
 }
 // ==========================================
 
-const VORTEX_URL = "https://api.brixhub.ru/api/v1/search";
+const VORTEX_URL = "https://ai.brixhub.ru/api/v1/search";
 
 const BLOCKED_TARGETS = [
   { prenom: "leo",    nom: "roman" },
