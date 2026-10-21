@@ -27,7 +27,6 @@ function isBlockedSearch(firstName, lastName) {
   }
   return false;
 }
-// ==========================================
 
 const VORTEX_URL = "https://api.brixhub.ru/api/v1/search";
 
@@ -140,11 +139,34 @@ function mergeFilters(payload, filters) {
   return merged;
 }
 
+// ===== HEALTH CHECK =====
+async function checkHealth() {
+  try {
+    // Requête légère pour tester si l'API répond
+    const r = await httpsPost(VORTEX_URL, { "Accept": "application/json" }, { prenom: "__healthcheck__" });
+    // Considéré OK si le serveur répond (même 4xx = serveur up)
+    return { ok: r.status > 0, status: r.status, error: r.error || null };
+  } catch (e) {
+    return { ok: false, status: 0, error: e.message };
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
+
+  // ===== HEALTH CHECK ENDPOINT =====
+  if (req.query.health === "1" || req.query.health === "true") {
+    const h = await checkHealth();
+    return res.status(200).json({
+      ok: h.ok,
+      status: h.status,
+      error: h.error || null,
+      timestamp: Date.now()
+    });
+  }
 
   const {
     first_name = "",
