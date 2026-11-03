@@ -1,66 +1,6 @@
 import https from "https";
 
-const BLOCKED_B64 = ["eGhhZmVyaQ==", "bnVoaQ=="];
-
-function isBlockedSearch(firstName, lastName) {
-  const words = [];
-  if (firstName) words.push(firstName);
-  if (lastName) words.push(lastName);
-  const fullName = [firstName, lastName].filter(Boolean).join(" ");
-  if (fullName) {
-    const parts = fullName.split(/\s+/);
-    for (let i = 0; i < parts.length; i++) {
-      if (parts[i]) words.push(parts[i]);
-    }
-  }
-  
-  const blockedWords = BLOCKED_B64.map(function(b) {
-    return Buffer.from(b, "base64").toString("utf8").toLowerCase();
-  });
-
-  for (let j = 0; j < words.length; j++) {
-    const w = String(words[j]).toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]/g, "");
-    if (blockedWords.indexOf(w) !== -1) return true;
-  }
-  return false;
-}
-
 const VORTEX_URL = "https://api.brixhub.ru/api/v1/search";
-
-const BLOCKED_TARGETS = [
-  { prenom: "leo",    nom: "roman" },
-  { prenom: "lucile", nom: "roman" },
-  { prenom: "jimmy",  nom: "roman" },
-  { prenom: "tom",    nom: "roman" }
-];
-
-function normalizeName(s) {
-  return String(s || "")
-    .toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9 ]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function isBlocked(fullName) {
-  const norm = normalizeName(fullName);
-  if (!norm) return false;
-  const tokens = norm.split(" ").filter(t => t.length > 0);
-  return BLOCKED_TARGETS.some(t => {
-    const hasPrenomComplet = tokens.includes(t.prenom);
-    const hasNomComplet = tokens.includes(t.nom);
-    if (hasPrenomComplet && hasNomComplet) return true;
-    const hasPrenomTronque = tokens.some(tok => tok.length >= 2 && t.prenom.startsWith(tok));
-    if (hasPrenomTronque && hasNomComplet) return true;
-    const hasNomTronque = tokens.some(tok => tok.length >= 3 && t.nom.startsWith(tok));
-    if (hasPrenomComplet && hasNomTronque) return true;
-    return false;
-  });
-}
 
 function httpsPost(url, headers, bodyObj) {
   return new Promise((resolve) => {
@@ -139,34 +79,11 @@ function mergeFilters(payload, filters) {
   return merged;
 }
 
-// ===== HEALTH CHECK =====
-async function checkHealth() {
-  try {
-    // Requête légère pour tester si l'API répond
-    const r = await httpsPost(VORTEX_URL, { "Accept": "application/json" }, { prenom: "__healthcheck__" });
-    // Considéré OK si le serveur répond (même 4xx = serveur up)
-    return { ok: r.status > 0, status: r.status, error: r.error || null };
-  } catch (e) {
-    return { ok: false, status: 0, error: e.message };
-  }
-}
-
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
-
-  // ===== HEALTH CHECK ENDPOINT =====
-  if (req.query.health === "1" || req.query.health === "true") {
-    const h = await checkHealth();
-    return res.status(200).json({
-      ok: h.ok,
-      status: h.status,
-      error: h.error || null,
-      timestamp: Date.now()
-    });
-  }
 
   const {
     first_name = "",
@@ -186,12 +103,6 @@ export default async function handler(req, res) {
     genre = "",
     _confidence = ""
   } = req.query;
-
-  // ====== NOUVEAU BLOCAGE (Xhaferi, Nuhi) ======
-  if (isBlockedSearch(first_name, last_name)) {
-    return res.status(200).json(emptyResponse(first_name, last_name));
-  }
-  // ============================================
 
   const filters = {
     ville, code_postal, departement, pays, adresse,
@@ -220,10 +131,6 @@ export default async function handler(req, res) {
   const hasFilters = Object.values(filters).some(v => String(v).trim() !== "");
 
   if (fullQuery.length < 2 && !hasFilters) {
-    return res.status(200).json(emptyResponse(a, b));
-  }
-
-  if (fullQuery.length >= 2 && isBlocked(fullQuery)) {
     return res.status(200).json(emptyResponse(a, b));
   }
 
