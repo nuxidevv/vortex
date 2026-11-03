@@ -12,9 +12,31 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* CSS (inchangé, voir précédent) */
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  :root{--bg:#030816;--glass:rgba(60,130,240,0.06);--glass-2:rgba(60,130,240,0.09);--glass-3:rgba(60,130,240,0.14);--glass-border:rgba(60,130,240,0.16);--glass-border-2:rgba(90,160,255,0.28);--glass-border-3:rgba(120,180,255,0.40);--text:#e6f0ff;--text-2:#8fa8cc;--text-3:#56739c;--text-4:#2e4463;--accent:#3b82f6;--accent-bright:#93c5fd;--accent-soft:rgba(59,130,246,0.16);--emerald:#34d399;--amber:#fbbf24;--rose:#fb7185;--r-sm:12px;--r:18px;--r-lg:26px;--r-xl:34px;--r-pill:999px;}
+  :root{
+    --bg:#030816;
+    --glass:rgba(60,130,240,0.06);
+    --glass-2:rgba(60,130,240,0.09);
+    --glass-3:rgba(60,130,240,0.14);
+    --glass-border:rgba(60,130,240,0.16);
+    --glass-border-2:rgba(90,160,255,0.28);
+    --glass-border-3:rgba(120,180,255,0.40);
+    --text:#e6f0ff;
+    --text-2:#8fa8cc;
+    --text-3:#56739c;
+    --text-4:#2e4463;
+    --accent:#3b82f6;
+    --accent-bright:#93c5fd;
+    --accent-soft:rgba(59,130,246,0.16);
+    --emerald:#34d399;
+    --amber:#fbbf24;
+    --rose:#fb7185;
+    --r-sm:12px;
+    --r:18px;
+    --r-lg:26px;
+    --r-xl:34px;
+    --r-pill:999px;
+  }
   html{scroll-behavior:smooth;}
   html,body{height:100%;}
   body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.55;position:relative;}
@@ -186,13 +208,14 @@
   .empty h3{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px;}
   .empty p{font-size:13px;color:var(--text-2);max-width:380px;margin:0 auto;line-height:1.6;}
 
-  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:20px;}
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:20px;}
   .stat{padding:14px 16px;border-radius:var(--r);background:linear-gradient(135deg,rgba(20,40,90,0.35) 0%,rgba(10,20,50,0.45) 100%);border:1px solid rgba(60,130,246,0.16);transition:background 0.25s,border-color 0.25s,box-shadow 0.35s;position:relative;overflow:hidden;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);}
   .stat:hover{background:linear-gradient(135deg,rgba(30,60,130,0.45) 0%,rgba(15,30,70,0.55) 100%);border-color:rgba(90,160,255,0.32);box-shadow:0 20px 40px rgba(0,0,0,0.5),0 0 40px -10px rgba(59,130,246,0.4);}
   .stat-label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:6px;}
   .stat-value{font-size:18px;font-weight:700;color:var(--text);font-family:'JetBrains Mono',monospace;letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;}
   .stat-value small{font-size:11px;color:var(--text-3);font-weight:500;letter-spacing:0;}
   .stat-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 10px var(--emerald),0 0 20px rgba(52,211,153,0.5);animation:livePulse 2s ease-in-out infinite;}
+  .stat-dot.live { background: #34d399; box-shadow: 0 0 10px #34d399; animation: pulse 1.5s infinite; }
 
   .section{margin-top:44px;}
   .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
@@ -366,6 +389,10 @@
   <div class="stats-row">
     <div class="stat"><div class="stat-label">Sources</div><div class="stat-value">14Md+ <small>indexées</small></div></div>
     <div class="stat"><div class="stat-label">Statut</div><div class="stat-value"><span class="stat-dot"></span>En ligne</div></div>
+    <div class="stat">
+      <div class="stat-label">Connectés</div>
+      <div class="stat-value"><span class="stat-dot live"></span><span id="onlineCount">...</span> <small>en direct</small></div>
+    </div>
   </div>
 
   <div class="glass search-card">
@@ -489,7 +516,7 @@
       <div class="type-card">
         <div class="type-ico">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 2 1 22 16.92z"></path>
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
           </svg>
         </div>
         <div class="type-title">Numéro de téléphone</div>
@@ -657,6 +684,54 @@
 <script>
 (function(){
   "use strict";
+
+  // ==========================================
+  // COMPTEUR RÉEL (100% sans simulation)
+  // ==========================================
+  var firebaseDbUrl = "https://vortex-b16a2-default-rtdb.firebaseio.com";
+  var userId = "user_" + Math.random().toString(36).substring(2, 15);
+  var presenceUrl = firebaseDbUrl + "/presence/" + userId + ".json";
+
+  // Fonction qui envoie un "signal de vie" toutes les 10 sec
+  function pingPresence() {
+    fetch(presenceUrl, {
+      method: 'PUT',
+      body: JSON.stringify(Date.now())
+    }).catch(function(err) {
+      // Si la base de données n'est pas configurée, on ignore l'erreur
+    });
+  }
+
+  // Fonction qui récupère le nombre de connectés (filtre < 30 sec)
+  function updateOnlineCount() {
+    fetch(firebaseDbUrl + "/presence.json")
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        var now = Date.now();
+        var count = 0;
+        if (data) {
+          for (var key in data) {
+            // Si le ping a été envoyé il y a moins de 30 secondes
+            if (now - data[key] < 30000) {
+              count++;
+            }
+          }
+        }
+        var el = document.getElementById('onlineCount');
+        if (el) el.textContent = count;
+      })
+      .catch(function() {
+        var el = document.getElementById('onlineCount');
+        if (el) el.textContent = "--";
+      });
+  }
+
+  // Lancer le système
+  pingPresence(); // Premier ping
+  setInterval(pingPresence, 10000); // Ping toutes les 10 secondes
+  updateOnlineCount(); // Récupérer le compte
+  setInterval(updateOnlineCount, 5000); // Mettre à jour l'affichage toutes les 5 secondes
+  // ==========================================
 
   function $(id){ return document.getElementById(id); }
   function esc(s){
@@ -871,11 +946,9 @@
 
   var TYPE_LABELS = { name:"Nom", email:"Email", phone:"Tél", mix:"Mixte" };
 
-  // Amélioration de la détection
   function detectType(v){
     v = (v || "").trim();
     if (!v) return null;
-    
     var hasEmail = /[^\s@]+@[^\s@]+\.[^\s@]+/.test(v);
     var hasPhone = /(?:\+?\d[\d\s.\-()]{4,}\d)/.test(v) && (v.match(/\d/g) || []).length >= 6;
     var hasName = /[a-zA-ZÀ-ÿ]{2,}/.test(v);
@@ -964,18 +1037,15 @@
     return null;
   }
 
-  // -------------- NOUVELLE LOGIQUE DE DÉCOUPAGE --------------
   function buildParams(){
     var v = input.value.trim(); 
     var f = readFilters(); 
     var p = {}; 
     
-    // 1. Extraction de l'email
     var emailMatch = v.match(/[^\s@]+@[^\s@]+\.[^\s@]+/);
     var email = emailMatch ? emailMatch[0] : "";
     var rest = email ? v.replace(email, " ") : v;
     
-    // 2. Extraction du téléphone (au moins 6 chiffres, espaces et tirets autorisés)
     var phoneMatch = rest.match(/(?:\+?\d[\d\s.\-()]{4,}\d)/);
     var telephone = "";
     if (phoneMatch) {
@@ -986,27 +1056,21 @@
        }
     }
     
-    // 3. Extraction des noms (ce qui reste)
     var nameWords = rest.replace(/[^a-zA-ZÀ-ÿ'\- ]/g, " ").split(/\s+/).filter(Boolean);
     var first_name = "";
     var last_name = "";
     
     if (nameWords.length > 0) {
         first_name = nameWords[0];
-        if (nameWords.length > 1) {
-            last_name = nameWords.slice(1).join(" ");
-        }
+        if (nameWords.length > 1) last_name = nameWords.slice(1).join(" ");
     }
     
-    // Remplissage des paramètres
     if (email) p.email = email;
-    if (telephone) p.telephone = telephone.replace(/[\s.\-()]/g, ""); // Nettoyage pour l'API
+    if (telephone) p.telephone = telephone.replace(/[\s.\-()]/g, "");
     if (first_name) p.first_name = first_name;
     if (last_name) p.last_name = last_name;
     
-    // Ajout des critères avancés
     Object.keys(f).forEach(function(k){ p[k] = f[k]; });
-    
     return p;
   }
 
@@ -1015,7 +1079,6 @@
     var hasF = Object.keys(readFilters()).length > 0;
     if (v.length === 0 && hasF) return true;
     if (v.length < 3) return false;
-    
     var t = detectType(v);
     if (t === "email") return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
     if (t === "phone") { var cl = v.replace(/[\s.\-()]/g, ""); return /^\+?\d{6,}$/.test(cl); }
