@@ -32,12 +32,7 @@ function emptyResponse(a, b) {
   return {
     data: [],
     message: "ok",
-    meta: {
-      total: 0,
-      page: 1,
-      per_page: 10,
-      query: { prenom: a, nom_famille: b }
-    }
+    meta: { total: 0, page: 1, per_page: 10, query: { prenom: a, nom_famille: b } }
   };
 }
 
@@ -61,10 +56,7 @@ function countResults(data) {
 
 function respond(res, result) {
   return res.status(200).json({
-    ok: result.ok,
-    status: result.status,
-    error: result.error || null,
-    data: result.data
+    ok: result.ok, status: result.status, error: result.error || null, data: result.data
   });
 }
 
@@ -86,80 +78,51 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
 
   const {
-    first_name = "",
-    last_name = "",
-    email = "",
-    telephone = "",
-    ville = "",
-    code_postal = "",
-    departement = "",
-    pays = "",
-    adresse = "",
-    adresse_ip = "",
-    discord_id = "",
-    iban = "",
-    bic = "",
-    annee_naissance = "",
-    genre = "",
-    _confidence = ""
+    first_name = "", last_name = "", email = "", telephone = "",
+    ville = "", code_postal = "", departement = "", pays = "", adresse = "",
+    adresse_ip = "", discord_id = "", iban = "", bic = "", annee_naissance = "", genre = "", _confidence = ""
   } = req.query;
 
   const filters = {
-    ville, code_postal, departement, pays, adresse,
-    adresse_ip, discord_id, iban, bic,
-    annee_naissance, genre, _confidence
+    ville, code_postal, departement, pays, adresse, adresse_ip, discord_id, iban, bic, annee_naissance, genre, _confidence
   };
-
-  const isEmailSearch = String(email).trim().length > 0;
-  const isPhoneSearch = String(telephone).trim().length > 0;
-
-  if (isEmailSearch) {
-    const r = await tryVortex(mergeFilters({ email: String(email).trim() }, filters));
-    return respond(res, r);
-  }
-
-  if (isPhoneSearch) {
-    const cleanPhone = String(telephone).replace(/[\s.\-()]/g, "").trim();
-    const r = await tryVortex(mergeFilters({ telephone: cleanPhone }, filters));
-    return respond(res, r);
-  }
 
   const a = String(first_name).trim();
   const b = String(last_name).trim();
+  const isEmailSearch = String(email).trim().length > 0;
+  const isPhoneSearch = String(telephone).trim().length > 0;
 
-  const fullQuery = [a, b].filter(Boolean).join(" ").trim();
-  const hasFilters = Object.values(filters).some(v => String(v).trim() !== "");
-
-  if (fullQuery.length < 2 && !hasFilters) {
-    return res.status(200).json(emptyResponse(a, b));
+  // Si on a un email, un téléphone, un nom, ou une combinaison, on envoie tout d'un coup
+  if (isEmailSearch || isPhoneSearch || (a.length > 0 && b.length > 0)) {
+    let payload = mergeFilters({}, filters);
+    
+    if (a) payload.prenom = a;
+    if (b) payload.nom_famille = b;
+    if (isEmailSearch) payload.email = String(email).trim();
+    if (isPhoneSearch) payload.telephone = String(telephone).replace(/[\s.\-()]/g, "").trim();
+    
+    const firstResult = await tryVortex(payload);
+    
+    // Si ça ne donne rien et qu'on avait un nom/prénom, on tente l'inversion
+    if (a && b && (!firstResult.ok || countResults(firstResult.data) === 0)) {
+       let invertedPayload = { ...payload };
+       invertedPayload.prenom = b;
+       invertedPayload.nom_famille = a;
+       const secondResult = await tryVortex(invertedPayload);
+       if (secondResult.ok && countResults(secondResult.data) > 0) return respond(res, secondResult);
+    }
+    
+    return respond(res, firstResult);
   }
 
-  const hasA = a.length > 0;
-  const hasB = b.length > 0;
-
-  if (hasA && hasB) {
-    const firstResult = await tryVortex(mergeFilters({ prenom: a, nom_famille: b }, filters));
-    if (firstResult.ok && countResults(firstResult.data) > 0) {
-      return respond(res, firstResult);
-    }
-    const secondResult = await tryVortex(mergeFilters({ prenom: b, nom_famille: a }, filters));
-    if (secondResult.ok && countResults(secondResult.data) > 0) {
-      return respond(res, secondResult);
-    }
-    return respond(res, secondResult || firstResult);
-  }
-
-  if (hasA) {
-    const r = await tryVortex(mergeFilters({ prenom: a }, filters));
+  // Si uniquement un des deux noms est fourni
+  if (a.length > 0 || b.length > 0) {
+    const queryName = a || b;
+    const r = await tryVortex(mergeFilters({ prenom: queryName }, filters));
     return respond(res, r);
   }
 
-  if (hasB) {
-    const r = await tryVortex(mergeFilters({ prenom: b }, filters));
-    return respond(res, r);
-  }
-
-  if (hasFilters) {
+  if (Object.values(filters).some(v => String(v).trim() !== "")) {
     const r = await tryVortex(mergeFilters({}, filters));
     return respond(res, r);
   }
