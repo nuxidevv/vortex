@@ -1,6 +1,5 @@
 const https = require('https');
 
-// LA BONNE URL EST ICI :
 const VORTEX_URL = "https://brixhub.ru/api/v1/search";
 
 function httpsPost(url, headers, bodyObj) {
@@ -32,7 +31,7 @@ function httpsPost(url, headers, bodyObj) {
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-API-Key');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
@@ -49,10 +48,9 @@ module.exports = async function handler(req, res) {
     }
   });
 
-  // On envoie la clé de deux façons différentes pour être sûr que l'API l'accepte
+  // LA CORRECTION EST ICI : Uniquement X-API-Key, comme demandé par la doc
   const headers = {
     "Accept": "application/json",
-    "Authorization": `Bearer ${apiKey}`,
     "X-API-Key": apiKey 
   };
 
@@ -65,12 +63,10 @@ module.exports = async function handler(req, res) {
     if (response.status >= 200 && response.status < 300) {
       return res.status(200).json({ ok: true, data: parsedData });
     } else {
-      // Si BrixHub refuse, on affiche le code et le message exact
       return res.status(response.status || 500).json({ 
         ok: false, 
-        error: `L'API a répondu (Code ${response.status}).`, 
-        details: parsedData,
-        rawBody: response.body
+        error: parsedData && parsedData.message ? parsedData.message : `L'API a répondu (Code ${response.status}).`, 
+        details: parsedData
       });
     }
   } catch (error) {
