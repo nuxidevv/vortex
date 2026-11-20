@@ -2,6 +2,7 @@ import https from "https";
 
 const VORTEX_URL = "https://api.brixhub.ru/api/v1/search";
 
+// Fonction utilitaire pour faire une requête POST HTTPS
 function httpsPost(url, headers, bodyObj) {
   return new Promise((resolve) => {
     const body = JSON.stringify(bodyObj);
@@ -28,104 +29,50 @@ function httpsPost(url, headers, bodyObj) {
   });
 }
 
-function emptyResponse(a, b) {
-  return {
-    data: [],
-    message: "ok",
-    meta: { total: 0, page: 1, per_page: 10, query: { prenom: a, nom_famille: b } }
-  };
-}
-
-async function tryVortex(payload) {
-  const headers = { "Accept": "application/json" };
-  const r = await httpsPost(VORTEX_URL, headers, payload);
-  let parsed = null;
-  try { parsed = JSON.parse(r.body); } catch { parsed = r.body; }
-  return { ok: r.status >= 200 && r.status < 300, status: r.status, error: r.error || null, data: parsed };
-}
-
-function countResults(data) {
-  if (!data || typeof data !== "object") return 0;
-  for (const k of ["results","data","items","records","hits","matches","persons","people"]) {
-    if (Array.isArray(data[k])) return data[k].length;
-  }
-  if (Array.isArray(data)) return data.length;
-  if (data.meta && typeof data.meta.total === "number") return data.meta.total;
-  return 0;
-}
-
-function respond(res, result) {
-  return res.status(200).json({
-    ok: result.ok, status: result.status, error: result.error || null, data: result.data
-  });
-}
-
-function mergeFilters(payload, filters) {
-  const merged = { ...payload };
-  Object.keys(filters).forEach(k => {
-    const v = filters[k];
-    if (v != null && String(v).trim() !== "") {
-      merged[k] = String(v).trim();
-    }
-  });
-  return merged;
-}
-
+// Fonction principale exportée pour Vercel
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  if (req.method === "OPTIONS") return res.status(200).end();
+  const apiKey = process.env.VORTEX_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ 
+      ok: false, 
+      error: "Configuration manquante." 
+    });
+  }
 
-  const {
-    first_name = "", last_name = "", email = "", telephone = "",
-    ville = "", code_postal = "", departement = "", pays = "", adresse = "",
-    adresse_ip = "", discord_id = "", iban = "", bic = "", annee_naissance = "", genre = "", _confidence = ""
-  } = req.query;
+  // 2. Construire le payload à partir des paramètres de la requête (query string)
+  // Le frontend envoie les critères en GET (ex: ?prenom=Jean&nom_famille=Dupont)
+  const payload = { ...req.query };
 
-  const filters = {
-    ville, code_postal, departement, pays, adresse, adresse_ip, discord_id, iban, bic, annee_naissance, genre, _confidence
+  // 3. Préparer les en-têtes pour l'API externe
+  const headers = {
+    "Accept": "application/json",
+    // La plupart des API attendent "Authorization: Bearer <clé>" ou "X-API-Key".
+    // Adapte le nom de l'en-tête selon la documentation de api.brixhub.ru.
+    "Authorization": `Bearer ${apiKey}` 
   };
 
-  const a = String(first_name).trim();
-  const b = String(last_name).trim();
-  const isEmailSearch = String(email).trim().length > 0;
-  const isPhoneSearch = String(telephone).trim().length > 0;
-
-  // Si on a un email, un téléphone, un nom, ou une combinaison, on envoie tout d'un coup
-  if (isEmailSearch || isPhoneSearch || (a.length > 0 && b.length > 0)) {
-    let payload = mergeFilters({}, filters);
+  try {
+    // 4. Appeler l'API externe avec la clé secrète
+    const response = await httpsPost(VORTEX_URL, headers, payload);
     
-    if (a) payload.prenom = a;
-    if (b) payload.nom_famille = b;
-    if (isEmailSearch) payload.email = String(email).trim();
-    if (isPhoneSearch) payload.telephone = String(telephone).replace(/[\s.\-()]/g, "").trim();
-    
-    const firstResult = await tryVortex(payload);
-    
-    // Si ça ne donne rien et qu'on avait un nom/prénom, on tente l'inversion
-    if (a && b && (!firstResult.ok || countResults(firstResult.data) === 0)) {
-       let invertedPayload = { ...payload };
-       invertedPayload.prenom = b;
-       invertedPayload.nom_famille = a;
-       const secondResult = await tryVortex(invertedPayload);
-       if (secondResult.ok && countResults(secondResult.data) > 0) return respond(res, secondResult);
+    let parsedData = null;
+    try { 
+      parsedData = JSON.parse(response.body); 
+    } catch { 
+      parsedData = response.body; 
     }
-    
-    return respond(res, firstResult);
-  }
 
-  // Si uniquement un des deux noms est fourni
-  if (a.length > 0 || b.length > 0) {
-    const queryName = a || b;
-    const r = await tryVortex(mergeFilters({ prenom: queryName }, filters));
-    return respond(res, r);
+    // 5. Renvoyer la réponse au frontend
+    if (response.status >= 200 && response.status < 300) {
+      return res.status(200).json({ ok: true, data: parsedData });
+    } else {
+      return res.status(response.status || 500).json({ 
+        ok: false, 
+        error: response.error || "Erreur de l'API externe", 
+        details: parsedData 
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({ ok: false, error: error.message });
   }
-
-  if (Object.values(filters).some(v => String(v).trim() !== "")) {
-    const r = await tryVortex(mergeFilters({}, filters));
-    return respond(res, r);
-  }
-
-  return res.status(200).json(emptyResponse(a, b));
 }
