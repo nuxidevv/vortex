@@ -1,8 +1,7 @@
-import https from "https";
+const https = require('https');
 
 const VORTEX_URL = "https://api.brixhub.ru/api/v1/search";
 
-// Fonction utilitaire pour faire une requête POST HTTPS
 function httpsPost(url, headers, bodyObj) {
   return new Promise((resolve) => {
     const body = JSON.stringify(bodyObj);
@@ -29,50 +28,64 @@ function httpsPost(url, headers, bodyObj) {
   });
 }
 
-// Fonction principale exportée pour Vercel
-export default async function handler(req, res) {
-  const apiKey = process.env.VORTEX_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ 
-      ok: false, 
-      error: "Configuration manquante." 
-    });
+module.exports = async function handler(req, res) {
+  // Gestion CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
-  // 2. Construire le payload à partir des paramètres de la requête (query string)
-  // Le frontend envoie les critères en GET (ex: ?prenom=Jean&nom_famille=Dupont)
-  const payload = { ...req.query };
+  // Vérification de la clé
+  const apiKey = process.env.VORTEX_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ ok: false, error: "Clé API manquante dans Vercel (VORTEX_API_KEY)." });
+  }
 
-  // 3. Préparer les en-têtes pour l'API externe
+  // Récupération des paramètres
+  const payload = req.method === 'GET' ? req.query : req.body;
+  const cleanPayload = {};
+  Object.keys(payload).forEach(key => {
+    if (payload[key] && String(payload[key]).trim() !== "") {
+      cleanPayload[key] = String(payload[key]).trim();
+    }
+  });
+
+  if (Object.keys(cleanPayload).length === 0) {
+    return res.status(400).json({ ok: false, error: "Aucun critère de recherche fourni." });
+  }
+
+  // Préparation de la requête
   const headers = {
     "Accept": "application/json",
-    // La plupart des API attendent "Authorization: Bearer <clé>" ou "X-API-Key".
-    // Adapte le nom de l'en-tête selon la documentation de api.brixhub.ru.
     "Authorization": `Bearer ${apiKey}` 
   };
 
   try {
-    // 4. Appeler l'API externe avec la clé secrète
-    const response = await httpsPost(VORTEX_URL, headers, payload);
+    const response = await httpsPost(VORTEX_URL, headers, cleanPayload);
     
     let parsedData = null;
-    try { 
-      parsedData = JSON.parse(response.body); 
-    } catch { 
-      parsedData = response.body; 
-    }
+    try { parsedData = JSON.parse(response.body); } catch { parsedData = response.body; }
 
-    // 5. Renvoyer la réponse au frontend
+    // Si l'API répond correctement
     if (response.status >= 200 && response.status < 300) {
       return res.status(200).json({ ok: true, data: parsedData });
-    } else {
+    } 
+    // Si la clé est mauvaise
+    else if (response.status === 401 || response.status === 403) {
+      return res.status(401).json({ ok: false, error: "Clé API refusée par BrixHub (401/403)." });
+    } 
+    // Autres erreurs
+    else {
       return res.status(response.status || 500).json({ 
         ok: false, 
-        error: response.error || "Erreur de l'API externe", 
+        error: `Erreur API externe (Code ${response.status})`, 
         details: parsedData 
       });
     }
   } catch (error) {
     return res.status(500).json({ ok: false, error: error.message });
   }
-}
+};
