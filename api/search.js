@@ -1,6 +1,7 @@
 const https = require('https');
 
-const VORTEX_URL = "https://api.brixhub.ru/api/v1/search";
+// LA BONNE URL EST ICI :
+const VORTEX_URL = "https://brixhub.ru/api/v1/search";
 
 function httpsPost(url, headers, bodyObj) {
   return new Promise((resolve) => {
@@ -29,22 +30,17 @@ function httpsPost(url, headers, bodyObj) {
 }
 
 module.exports = async function handler(req, res) {
-  // Gestion CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // Vérification de la clé
   const apiKey = process.env.VORTEX_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ ok: false, error: "Clé API manquante dans Vercel (VORTEX_API_KEY)." });
+    return res.status(500).json({ ok: false, error: "ERREUR: La clé VORTEX_API_KEY est introuvable dans Vercel." });
   }
 
-  // Récupération des paramètres
   const payload = req.method === 'GET' ? req.query : req.body;
   const cleanPayload = {};
   Object.keys(payload).forEach(key => {
@@ -53,14 +49,11 @@ module.exports = async function handler(req, res) {
     }
   });
 
-  if (Object.keys(cleanPayload).length === 0) {
-    return res.status(400).json({ ok: false, error: "Aucun critère de recherche fourni." });
-  }
-
-  // Préparation de la requête
+  // On envoie la clé de deux façons différentes pour être sûr que l'API l'accepte
   const headers = {
     "Accept": "application/json",
-    "Authorization": `Bearer ${apiKey}` 
+    "Authorization": `Bearer ${apiKey}`,
+    "X-API-Key": apiKey 
   };
 
   try {
@@ -69,23 +62,18 @@ module.exports = async function handler(req, res) {
     let parsedData = null;
     try { parsedData = JSON.parse(response.body); } catch { parsedData = response.body; }
 
-    // Si l'API répond correctement
     if (response.status >= 200 && response.status < 300) {
       return res.status(200).json({ ok: true, data: parsedData });
-    } 
-    // Si la clé est mauvaise
-    else if (response.status === 401 || response.status === 403) {
-      return res.status(401).json({ ok: false, error: "Clé API refusée par BrixHub (401/403)." });
-    } 
-    // Autres erreurs
-    else {
+    } else {
+      // Si BrixHub refuse, on affiche le code et le message exact
       return res.status(response.status || 500).json({ 
         ok: false, 
-        error: `Erreur API externe (Code ${response.status})`, 
-        details: parsedData 
+        error: `L'API a répondu (Code ${response.status}).`, 
+        details: parsedData,
+        rawBody: response.body
       });
     }
   } catch (error) {
-    return res.status(500).json({ ok: false, error: error.message });
+    return res.status(500).json({ ok: false, error: `Erreur de connexion : ${error.message}` });
   }
 };
