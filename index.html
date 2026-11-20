@@ -1065,8 +1065,8 @@
     
     if (email) p.email = email;
     if (telephone) p.telephone = telephone.replace(/[\s.\-()]/g, "");
-    if (first_name) p.first_name = first_name;
-    if (last_name) p.last_name = last_name;
+    if (first_name) p.prenom = first_name;      // CORRIGÉ
+    if (last_name) p.nom_famille = last_name;   // CORRIGÉ
     
     Object.keys(f).forEach(function(k){ p[k] = f[k]; });
     return p;
@@ -1242,12 +1242,25 @@
     if (!validate()) { toast("Entrée invalide — 3 caractères minimum", "error", 2200); input.focus(); return; }
     setLoading(true); renderLoading();
     var params = buildParams();
+    
     httpGet(params).then(function(r){
+      // Gestion des erreurs API
+      if (!r.ok || (r.data && r.data.ok === false)) {
+        var errorMsg = (r.data && r.data.error) ? r.data.error : "Erreur de communication avec l'API.";
+        renderEmpty(errorMsg); 
+        toast(errorMsg, "error", 5000); 
+        setLoading(false); 
+        return;
+      }
+
       var items = [];
       if (r && r.data) items = findArray(r.data) || [];
       
       if (!items.length) {
-        renderEmpty(); toast("Aucun résultat trouvé", "error", 2500); setLoading(false); return;
+        renderEmpty("Aucun résultat ne correspond à cette recherche."); 
+        toast("Aucun résultat trouvé", "error", 2500); 
+        setLoading(false); 
+        return;
       }
 
       currentItems = items;
@@ -1268,7 +1281,9 @@
       toast(items.length + " résultat" + (items.length>1?'s':''), "success", 1800);
       setLoading(false);
     }).catch(function(err){
-      $("out").innerHTML = ""; toast("Erreur : " + err.message, "error", 4000); setLoading(false);
+      $("out").innerHTML = ""; 
+      toast("Erreur réseau : " + err.message, "error", 4000); 
+      setLoading(false);
     });
   });
 
